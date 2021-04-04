@@ -11,11 +11,13 @@ Armi Tiihonen, Sarah J. Cox-Vazquez, Qiaohao Liang, Mohamed Ragab, Zekun Ren, No
 Molecule data in this repository is provided by Sarah J. Cox-Vazquez and Guillermo C. Bazan.
 
 ## Installation
-To install, just clone the following repository and sub-repository:
+To install, just clone this repository and chemprop repository:
 
 `$ git clone https://github.com/PV-Lab/MLforCOE.git`
 
 `$ cd MlforCOE`
+
+`$ git clone https://github.com/chemprop/chemprop .`
 
 To install the required packages, create a virtual environment using Anaconda (Optional but recommended setup):
 

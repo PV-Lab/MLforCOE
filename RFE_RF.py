@@ -282,12 +282,12 @@ if __name__ == "__main__":
     # by looking at the dataframe+graphs or by using idxmin. This variable
     # affects to how many descriptors are printed out when reporting results,
     # not to RFE itself.
-    optimum_cutoff = 9
+    optimum_cutoff = 21
     
     ###########################################################################
     # Load data.
-    X = fetch_csv('./Data/Downselection_data_files/x_cor_train_seed3')
-    y = fetch_csv('./Data/Downselection_data_files/y_cor_train_seed3')
+    X = fetch_csv('./Data/Downselection_data_files/x_cor_train_seed3', index_col=None)
+    y = fetch_csv('./Data/Downselection_data_files/y_cor_train_seed3').iloc[:,[-1]] # Dropping smiles.
     groups = fetch_csv('./Data/Downselection_data_files/groups_train_seed3')
     
     ###########################################################################

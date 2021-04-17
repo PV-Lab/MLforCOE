@@ -45,18 +45,18 @@ def GP_train_test_newdata(X_list, y_list, groups_train, ho_params,
     if ho_params is not None:
         print('HO params not implemented for GP!\n')
     else:
-        feature_weights1, top_feature_weights1, regressor1, R21, RMSE1, scaler1, X_test1, y_test1, y_pred1, X_train1, y_train1 = GP_feature_analysis(
+        feature_weights1, top_feature_weights1, regressor1, R21, RMSE1, scaler1, X_test1, y_test1, y_pred1, X_train1, y_train1, std_pred1 = GP_feature_analysis(
                         list_X, list_y, groups=None,
                         groups_only_for_plotting = False,
                         test_indices = None, test_proportion = None,
                         top_n = 21, random_state = random_state,
                         sample_weighing = False, plotting=True,
                         saveas = saveas, title = None)
-    test_results = [feature_weights1, top_feature_weights1, regressor1, R21, RMSE1, scaler1, X_test1, y_test1, y_pred1, X_train1, y_train1]
+    test_results = [feature_weights1, top_feature_weights1, regressor1, R21, RMSE1, scaler1, X_test1, y_test1, y_pred1, X_train1, y_train1, std_pred1]
     print('Test set RMSE=', RMSE1, ' and R2=', R21)
     
-    R2_newdata, RMSE_newdata, y_pred_newdata = predict_plot_GP(regressor1, X_newdata, y_newdata, scaler1, plotting=True, title=None, groups = None, saveas = 'Plot_result_GP_new_dataset_newdata')
-    val_results = [R2_newdata, RMSE_newdata, y_pred_newdata]
+    R2_newdata, RMSE_newdata, y_pred_newdata, std_pred_newdata = predict_plot_GP(regressor1, X_newdata, y_newdata, scaler1, plotting=True, title=None, groups = None, saveas = saveas+'_newdata')
+    val_results = [R2_newdata, RMSE_newdata, y_pred_newdata, std_pred_newdata]
     print('Exp. validation set RMSE=', RMSE_newdata, ' and R2=', R2_newdata)
     ###############################################################################
 

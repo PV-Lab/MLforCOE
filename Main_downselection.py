@@ -70,12 +70,12 @@ def RF_train_test_newdata(X_list, y_list, groups_train, ho_params,
     print('Test set RMSE=', RMSE1, ' and R2=', R21)
     
     R2_newdata, RMSE_newdata, y_pred_newdata = predict_plot_RF(regressor1, X_newdata, y_newdata, plotting=True, title=None, groups = None, saveas = saveas+'_newdata')
-    val_results = [R2_newdata, RMSE_newdata, y_pred_newdata]
-    print('Exp. validation set RMSE=', RMSE_newdata, ' and R2=', R2_newdata)
+    newdata_results = [R2_newdata, RMSE_newdata, y_pred_newdata]
+    print('New dataset RMSE=', RMSE_newdata, ' and R2=', R2_newdata)
     
     ###############################################################################
 
-    return cv_results, test_results, val_results
+    return cv_results, test_results, newdata_results
 
 def divide_train_test_newdata_X_y(dataset_train, dataset_test, dataset_newdata, corrMatrixVar, corrMatrixCor, save = True, random_state = None, y_column=3):
     
@@ -109,7 +109,7 @@ def divide_train_test_newdata_X_y(dataset_train, dataset_test, dataset_newdata, 
         
         X_savedata = [X_init_newdata, X_var_newdata, X_cor_newdata,
                   X_init_train, X_var_train, X_cor_train,
-                  X_init_test, X_cor_test, X_cor_test]
+                  X_init_test, X_var_test, X_cor_test]
         corresponding_x_paths = ['./Data/Downselection_data_files/x_init_newdata',
                         './Data/Downselection_data_files/x_var_newdata',
                         './Data/Downselection_data_files/x_cor_newdata',
@@ -144,7 +144,7 @@ def divide_train_test_newdata_X_y(dataset_train, dataset_test, dataset_newdata, 
             smiles = corresponding_dataset[i].loc[y_savedata[i].index, ['smiles']].copy()
             y_savedatasmiles.append(pd.concat([smiles, y_savedata[i]], axis=1, verify_integrity=True))
             
-            if ((random_state is not None) and (i>3)):
+            if ((random_state is not None) and (i>2)):
                 
                 save_to_csv_pickle(y_savedatasmiles[i], corresponding_y_paths[i] + '_seed'+ str(random_state))                
                 save_to_csv_pickle(X_savedata[i], corresponding_x_paths[i] + '_seed'+ str(random_state), index=False) # chemprop does not know how to treat index
@@ -227,9 +227,10 @@ def save_cv_splits_to_csvs(X_train, y_train, X_cvtests, y_cvtests, X_cvtrains, y
             except KeyError:
                 pass
         
+        val_test_length = int(len(y_cvtests[i].index)/2)
         current_split = [np.array([list(y_train.index).index(j) for j in y_cvtrains[i].index]),
-                         np.array([list(y_train.index).index(j) for j in y_cvtests[i].index]),
-                         np.array([list(y_train.index).index(j) for j in y_cvtests[i].index])
+                         np.array([list(y_train.index).index(j) for j in y_cvtests[i].index[0:val_test_length]]),
+                         np.array([list(y_train.index).index(j) for j in y_cvtests[i].index[val_test_length:(-1)]])
                          ]
 
         #print(current_split)
@@ -251,15 +252,16 @@ if __name__ == "__main__":
     ##########################################################################
     # INPUT VALUES
     
-    source_excel_file = './Data/10232020 5k descriptors.xlsx'
+    source_excel_file = './Data/04142021 5k descriptors.xlsx'
     y_column=3 # Location of MIC data in source Excel file.
     variance_limit = 0.1 # Relative variance filtering limit value.
     test_proportion = 0.2 # Test dataset proportion of the full dataset.
     random_state = 3 # Random state for train test divisions and model trainings.
     plotCorrMatrix = True # Setting this code to False makes the code run faster.
-    # If True, saves the datafiles.
-    save = False
-    
+    # If True, saves the train-test datafiles.
+    save = True
+    # If this is True, saves the repeated subsampling splits for train-test.
+    save_cv = False
     # Figure formatting options.
     mystyle = FigureDefaults('nature_comp_mat_sc')
     
@@ -268,9 +270,10 @@ if __name__ == "__main__":
     # new predictions or as an additional, experimental validation set. Here
     # is an example.
     name_newdata = ['COE2-3C-C3propylOH', 'COE2-3C-C3TEEDA', 'COE-A7', 'COE-D62OH',
-                'COE-Tt6', 'COE-Tt66C', 'COE-Tt6IM11', 'A6', 'A6IM1', 'A6IM2',
-                'A6PR1', 'A8', 'Amethyl', 'Amidine', 'D4EtIM2', 'D62N22N2',
-                'Y62C', 'Y6N24C', 'COE2-3F']
+                #'COE-Tt6', 
+                'COE-Tt66C', 'COE-Tt6IM11', 'COE-A6', 'COE-A6IM1', 'COE-A6IM2',
+                'COE-A6PR1', 'COE-A8', 'Amethyl', 'Amidine', 'COE-D4EtIM2', #'COE-D62N22N2',
+                'COE-Y62C', 'COE-Y6N24C']#, 'COE2-3F']
     
     # Hyperparameters. Have been optimized separately.
     ho_init = {'bootstrap': True, 'max_depth': 11, 'max_features': 'sqrt',
@@ -287,14 +290,21 @@ if __name__ == "__main__":
                'min_samples_split': 2, 'n_estimators': 236}
     
     # Opt fingerprint. RFE has been performed separately.
-    opt_descr_names = ['O%', 'MSD', 'MaxDD', 'CIC3', 'TI2_L', 'MATS8m', 'MATS2v', 'MATS7e',
-       'P_VSA_MR_5', 'VE1sign_G', 'VE1sign_G/D', 'Mor22u', 'Mor20m', 'Mor25m',
-       'Mor26m', 'Mor31m', 'Mor10v', 'Mor20v', 'Mor25v', 'R4i', 'H-047',
-       'CATS2D_03_AL', 'SHED_AA', 'MLOGP2', 'ALOGP']
-    #opt_descr_names = ['O%', 'MSD', 'MaxDD', 'CIC4', 'TI2_L', 'MATS2p', 'P_VSA_LogP_2',
-    #   'P_VSA_MR_5', 'TDB07s', 'TDB10s', 'Mor06m', 'Mor20m', 'Mor25m',
-    #   'Mor31m', 'Mor10v', 'Mor20v', 'Mor25v', 'Mor13s', 'H7u', 'R7u', 'R4i',
-    #   'H-047', 'F02[C-N]', 'ALOGP']    
+    opt_descr_names = ['MSD', 'MaxDD', 'TI2_L', 'MATS4v', 'MATS4i', 'P_VSA_MR_5', 'P_VSA_MR_6',
+       'TDB06s', 'RDF040m', 'Mor20m', 'Mor25m', 'Mor31m', 'Mor10v', 'Mor20v',
+       'Mor25v', 'Mor26s', 'R7u', 'H-046', 'H-047', 'SHED_AL', 'ALOGP']
+    '''
+    opt_descr_names = ['MSD', 'MaxDD', 'TI2_L', 'MATS4v', 'MATS4i', 'P_VSA_MR_5', 'P_VSA_MR_6',
+       'TDB06s', 'RDF040m', 'Mor20m', 'Mor25m', 'Mor31m', 'Mor10v', 'Mor20v',
+       'Mor25v', 'R7u', 'H-046', 'H-047', 'SHED_AL', 'ALOGP']
+    opt_descr_names = ['MSD', 'MaxDD', 'TI2_L', 'MATS4v', 'MATS4i', 'P_VSA_MR_5', 'P_VSA_MR_6',
+       'TDB06s', 'RDF040m', 'Mor20m', 'Mor25m', 'Mor31m', 'Mor10v', 'Mor20v',
+       'Mor25v', 'Mor26s', 'R7u', 'H-046', 'H-047', 'SHED_AL', 'ALOGP']
+    opt_descr_names = ['O%', 'MSD', 'MaxDD', 'CIC4', 'TI2_L', 'MATS2p', 'P_VSA_MR_5', 'P_VSA_LogP_2', 'Mor20m', 'Mor25m', 'Mor31m', 'Mor10v', 'Mor20v', 'Mor25v', 'Mor13s', 'Mor06m', 'R4i', 'R7u', 'H-047', 'ALOGP', 'H7u', 'TDB07s', 'TDB10s', 'F02[C-N]']
+    opt_descr_names = ['MSD', 'MaxDD', 'TI2_L', 'MATS4v', 'MATS4i', 'P_VSA_MR_5', 'TDB06s',
+       'RDF040m', 'Mor06m', 'Mor20m', 'Mor25m', 'Mor31m', 'Mor10v', 'Mor20v',
+       'Mor25v', 'R7u', 'H-046', 'H-047', 'SHED_AL', 'ALOGP']
+    '''
     ##########################################################################
     # CODE EXECUTION STARTS
     
@@ -328,10 +338,10 @@ if __name__ == "__main__":
     #save_to_csv_pickle(dataset, './Data/dataset_outliers_dropped')
     #save_to_csv_pickle(groups, './Data/groups_outliers_dropped')
 
-    #X=fetch_csv('./Data/X_outliers_dropped')
-    #y=fetch_csv('./Data/y_outliers_dropped')
-    #dataset = fetch_csv('./Data/dataset_outliers_dropped')
-    #groups = fetch_csv('./Data/groups_outliers_dropped')
+    X=fetch_csv('./Data/X_outliers_dropped')
+    y=fetch_csv('./Data/y_outliers_dropped')
+    dataset = fetch_csv('./Data/dataset_outliers_dropped')
+    groups = fetch_csv('./Data/groups_outliers_dropped')
     '''
     Results from the single-molecule test set filtering (lim=3.5 which is default):
     
@@ -341,6 +351,19 @@ if __name__ == "__main__":
     dataset = dataset[~dataset.name.isin(outliers)]    
     X, y = pick_xy_from_corrmatrix(dataset, corrMatrixFull)
     groups = define_groups_yvalue(y)
+    
+    
+    There are  9  molecules with RMSE> 3.5 . These will be dropped from the analysis.
+        no                   name  log2mic
+1      2.0            COE-A8C-HAc      9.0
+14    15.0            COE-D6C-HAc      9.0
+23    24.0             COE-D63SO3      9.0
+42    43.0              COE2-2pip      7.0
+102  110.0                 COE-S6     10.0
+117  127.0  COE-PYRAZINE-3C-BUTYL      8.0
+137  147.0                Amidine      0.0
+141  151.0                   Y62C      7.0
+142  152.0                 Y6N24C      6.0
     
     There are  9  molecules with RMSE> 3.5 . These will be dropped from the analysis.
             no                   name  log2mic
@@ -411,20 +434,21 @@ if __name__ == "__main__":
                  40, 124, 59, 97, 125, 113, 38, 20, 129, 47, 
                  92, 39, 111, 68, 81, 44, 53, 95, 109, 87, 
                  66, 118, 49, 107, 123, 67, 7, 24, 135, 60, 
-                 13, 116, 22, 30, 65, 4, 41, 14, 18, 108]
+                 13, 116, 22, 30, 65, 4, 41, 14, 
+                 18, 108]
     test_idx = [54, 128, 126, 76, 96, 32, 84, 69, 6, 115, 
                 5, 2, 56, 12, 90, 79, 74, 93, 31, 37]
     # Seed 5:
-    train_idx = [32, 80, 15, 95, 129, 21, 111, 107, 25, 3, 
-                 8, 13, 28, 112, 26, 69, 115, 37, 63, 35, 
-                 27, 54, 56, 90, 96, 53, 79, 24, 88, 67, 
-                 65, 62, 87, 74, 77, 84, 119, 66, 127, 17, 
-                 75, 61, 22, 135, 110, 98, 4, 39, 41, 5, 
-                 40, 30, 124, 47, 114, 2, 81, 93, 19, 14, 
-                 106, 45, 68, 99, 94, 89, 70, 113, 60, 125, 
-                 76, 59, 46, 92, 86, 29, 126] 
-    test_idx = [20, 31, 49, 12, 91, 82, 50, 6, 18, 108, 
-                 52, 7, 38, 116, 123, 85, 128, 16, 55, 44]
+    #train_idx = [32, 80, 15, 95, 129, 21, 111, 107, 25, 3, 
+    #             8, 13, 28, 112, 26, 69, 115, 37, 63, 35, 
+    #             27, 54, 56, 90, 96, 53, 79, 24, 88, 67, 
+    #             65, 62, 87, 74, 77, 84, 119, 66, 127, 17, 
+    #             75, 61, 22, 135, 110, 98, 4, 39, 41, 5, 
+    #             40, 30, 124, 47, 114, 2, 81, 93, 19, 14, 
+    #             106, 45, 68, 99, 94, 89, 70, 113, 60, 125, 
+    #             76, 59, 46, 92, 86, 29, 126] 
+    #test_idx = [20, 31, 49, 12, 91, 82, 50, 6, 18, 108, 
+    #             52, 7, 38, 116, 123, 85, 128, 16, 55, 44]
     
     dataset_train = dataset.loc[train_idx,:].copy()
     dataset_test = dataset.loc[test_idx,:].copy()
@@ -432,7 +456,7 @@ if __name__ == "__main__":
     # IF YOU WANT TO PERFORM THE PIPELINE FROM ZERO, ACTIVATE THE NEXT LINES OF CODE! 
     #dataset_train, dataset_test = train_test_split(dataset,
     #                                                   test_size=test_proportion,
-    #                                                   random_state=random_state,
+    #                                                  random_state=random_state,
     #                                                   stratify=groups)
     
     
@@ -450,17 +474,7 @@ if __name__ == "__main__":
                                                                  filterWithCorrMatrix = True,
                                                                  corrMatrixForFiltering = corrMatrixVar,
                                                                  plotCorrMatrix = plotCorrMatrix)
-    
-    '''
-    Initial dataset: 5258 descriptors
-    After dropping constant or almost constant descriptors: 1701 descriptors
-    After dropping constant or almost constant descriptors: 1701 descriptors
-    After filtering out highly correlated descriptors (limit 0.9: 352 descriptors
-    Correlation with Y higher than 0.05: 250 descriptors
-    '''
-    
-    
-    
+
     # Forming of train, test.
     ##########################################################################
     
@@ -481,26 +495,26 @@ if __name__ == "__main__":
     mystyle = FigureDefaults('nature_comp_mat_tc')
     
     print('\nInit. fingerprint:\n')
-    cv_results_init, test_results_init, val_results_init = RF_train_test_newdata(
+    cv_results_init, test_results_init, newdata_results_init = RF_train_test_newdata(
             [X_init_train, X_init_test, X_init_newdata],
             [y_init_train, y_init_test, y_init_newdata], groups_train, ho_init,
-            saveas='./Results/rf_init_seed' + str(random_state), save_cv = save,
+            saveas='./Results/rf_init_seed' + str(random_state), save_cv = save_cv,
             save_cv_path = './Data/Downselection_data_files/CV_splits/Seed'+str(random_state) + '/', 
             save_cv_fingerprint = 'init', random_state=random_state)
     
     print('\nVar. fingerprint:\n')
-    cv_results_var, test_results_var, val_results_var = RF_train_test_newdata(
+    cv_results_var, test_results_var, newdata_results_var = RF_train_test_newdata(
             [X_var_train, X_var_test, X_var_newdata],
             [y_var_train, y_var_test, y_var_newdata], groups_train, ho_var,
-            saveas='./Results/rf_var_seed'  + str(random_state), save_cv = save,
+            saveas='./Results/rf_var_seed'  + str(random_state), save_cv = save_cv,
             save_cv_path = './Data/Downselection_data_files/CV_splits/Seed'+str(random_state) + '/',
             save_cv_fingerprint='var', random_state=random_state)
     
     print('\nCor. fingerprint:\n')
-    cv_results_cor, test_results_cor, val_results_cor = RF_train_test_newdata(
+    cv_results_cor, test_results_cor, newdata_results_cor = RF_train_test_newdata(
             [X_cor_train, X_cor_test, X_cor_newdata],
             [y_cor_train, y_cor_test, y_cor_newdata], groups_train, ho_cor,
-            saveas='./Results/rf_cor_seed'  + str(random_state), save_cv = save,
+            saveas='./Results/rf_cor_seed'  + str(random_state), save_cv = save_cv,
             save_cv_path = './Data/Downselection_data_files/CV_splits/Seed'+str(random_state) + '/',
             save_cv_fingerprint='cor', random_state=random_state)
     
@@ -540,17 +554,15 @@ if __name__ == "__main__":
     mystyle = FigureDefaults('nature_comp_mat_tc')
     
     print('\nOpt. fingerprint:\n')
-    cv_results_opt, test_results_opt, val_results_opt = RF_train_test_newdata(
+    cv_results_opt, test_results_opt, newdata_results_opt = RF_train_test_newdata(
             [X_opt_train, X_opt_test, X_opt_newdata],
             [y_opt_train, y_opt_test, y_opt_newdata], groups_train, ho_opt,
-            saveas='./Results/rf_opt_seed' + str(random_state), save_cv = save, 
+            saveas='./Results/rf_opt_seed' + str(random_state), save_cv = save_cv, 
             save_cv_path = './Data/Downselection_data_files/CV_splits/Seed'+str(random_state) + '/',
             save_cv_fingerprint = 'opt', random_state=random_state)
-    # Save the fully train RF model to a pickle for later use.
+    # Save the fully trained RF model to a pickle for later use.
     save_to_pickle(test_results_opt[2], './Results/RF_regressor_opt_seed' + str(random_state))
-    ## TO DO: Write how to laod the model and  do the prediction.
-    # Link the repo.
-
+    
 '''
 Print-outs:
     
@@ -562,66 +574,66 @@ Correlation with Y higher than 0.05: 233 descriptors
 
 Init. fingerprint:
 
-R2 and RMSE for dataset  0 :  [0.32241416 0.62817502 0.35609366 0.20141286 0.22789961 0.13450312
- 0.58354721 0.27725848 0.17981313 0.48599049 0.37132519 0.3588737
- 0.27264983 0.35267559 0.18457416 0.23349373 0.37690115 0.67893828
- 0.22180551 0.44979045] [1.52617212 1.26111985 1.65122407 1.72691165 1.78463277 2.13163285
- 1.4912387  1.74938808 1.81039875 1.45543168 1.6073147  1.67404395
- 1.62289962 1.60834357 1.56405803 1.7295002  1.67377145 1.12825509
- 1.75653624 1.52636614]
-Mean:  0.34490676530863945 1.6239619743165903
-Std:  0.15019286728830605 0.20318423076292907
-Min:  0.13450312108031692 1.1282550891367997
-Max:  0.6789382819529551 2.1316328516722423
-Test set RMSE= 1.190647010189615  and R2= 0.5842697059022085
-Exp. validation set RMSE= 2.1406542551339145  and R2= 0.040437472815710196
+R2 and RMSE for dataset  0 :  [0.3182764  0.62954513 0.39785816 0.26466231 0.29064215 0.16805094
+ 0.52915618 0.3001113  0.33664034 0.45540162 0.36574063 0.38300059
+ 0.32354466 0.32397885 0.16993702 0.25946456 0.3680365  0.68743985
+ 0.23366259 0.44481329] [1.5308249  1.25879419 1.59677624 1.65711397 1.71058502 2.08991209
+ 1.58563314 1.72150841 1.62814232 1.49811248 1.61443785 1.64224306
+ 1.56509048 1.64360697 1.57803325 1.69994819 1.68563554 1.11321703
+ 1.74310301 1.5332543 ]
+Mean:  0.36249815311910105 1.6047986213136163
+Std:  0.13193774773709716 0.1853665341897662
+Min:  0.16805094256102304 1.1132170260401506
+Max:  0.6874398525627454 2.089912091824589
+Test set RMSE= 1.1965045888440924  and R2= 0.58016914043256
+New dataset RMSE= 2.199879962074483  and R2= -0.013393677475660892
 
 Var. fingerprint:
 
-R2 and RMSE for dataset  0 :  [0.37187128 0.61679869 0.3153964  0.31017535 0.23989368 0.28373311
- 0.50622319 0.34360411 0.1221647  0.37699735 0.41391289 0.34760382
- 0.2843715  0.36748368 0.00755165 0.24677099 0.3266437  0.58388257
- 0.30514152 0.38529561] [1.46941909 1.28026705 1.70260635 1.60501212 1.77071696 1.93917538
- 1.62378908 1.66716116 1.87294211 1.60232716 1.55191872 1.68869324
- 1.60976951 1.58984103 1.7254985  1.71445575 1.73996352 1.28446121
- 1.65982086 1.61334711]
-Mean:  0.3377757902252506 1.6355592966739594
-Std:  0.13419926875190058 0.1565960022272161
-Min:  0.007551647260153671 1.2802670499075095
-Max:  0.6167986921605547 1.9391753809356431
-Test set RMSE= 1.1790724179333332  and R2= 0.5923132648882239
-Exp. validation set RMSE= 2.039427238956397  and R2= 0.129043120996289
+R2 and RMSE for dataset  0 :  [0.38218409 0.63018068 0.3453451  0.31084226 0.2742482  0.27882303
+ 0.50457917 0.29126392 0.16316969 0.41755513 0.37870902 0.34348273
+ 0.33551604 0.39228836 0.05395678 0.2472965  0.31313895 0.61342098
+ 0.33218534 0.39854688] [1.45730648 1.25771394 1.66494875 1.60423609 1.73023876 1.94581066
+ 1.62649003 1.73235514 1.82867503 1.54929337 1.59784781 1.69401846
+ 1.55117978 1.55835576 1.68467494 1.71385758 1.75732515 1.23803288
+ 1.62720029 1.59586279]
+Mean:  0.35033664294275735 1.6207711838430332
+Std:  0.12907091976027885 0.1631536607390511
+Min:  0.053956780446867136 1.2380328760579873
+Max:  0.6301806804676722 1.9458106583239294
+Test set RMSE= 1.1893163228864636  and R2= 0.5851984410896836
+New dataset RMSE= 2.1192762027840764  and R2= 0.059507480510009314
 
 Cor. fingerprint:
 
-R2 and RMSE for dataset  0 :  [0.46566826 0.66122962 0.37778904 0.33213529 0.41543267 0.3772301
- 0.51228743 0.42721474 0.13153395 0.38827519 0.48086908 0.37395532
- 0.38597716 0.41244054 0.1853854  0.3394406  0.25729022 0.62612348
- 0.40879917 0.52166442] [1.35527317 1.20375967 1.62316806 1.57925846 1.55284907 1.80818749
- 1.61378714 1.5573656  1.86292023 1.58775795 1.46058332 1.65423699
- 1.49111846 1.5322998  1.56327982 1.60553102 1.82737319 1.21752289
- 1.53101891 1.42318383]
-Mean:  0.4040370840087414 1.5525237519956883
-Std:  0.12395915264429264 0.16790479887763188
-Min:  0.13153394695588605 1.203759672471813
-Max:  0.6612296243271432 1.862920225521413
-Test set RMSE= 1.3704579978254965  and R2= 0.4492213713185136
-Exp. validation set RMSE= 1.8714137639977306  and R2= 0.26663553706013865
+R2 and RMSE for dataset  0 :  [0.44885599 0.60064301 0.343755   0.33467184 0.35753398 0.33458858
+ 0.49800581 0.41940865 0.20030442 0.36750817 0.43065155 0.43034348
+ 0.41704058 0.44000334 0.25613455 0.4095711  0.31583366 0.57750993
+ 0.45615759 0.51066803] [1.37642927 1.30697633 1.66696953 1.5762566  1.62793499 1.86906659
+ 1.6372448  1.56794181 1.78764048 1.61448385 1.52959678 1.57798037
+ 1.45291112 1.49592752 1.49385286 1.51791189 1.75387457 1.2942593
+ 1.46841758 1.43944957]
+Mean:  0.4074594624433817 1.552756290960041
+Std:  0.0960456703799418 0.14550350235860046
+Min:  0.2003044248630147 1.29425929674138
+Max:  0.6006430108188192 1.8690665948059648
+Test set RMSE= 1.2577357418209225  and R2= 0.5360999424475583
+New dataset RMSE= 1.9705522009764813  and R2= 0.18687725272696787
 
 Opt. fingerprint:
 
-R2 and RMSE for dataset  0 :  [0.60280647 0.67457837 0.53668279 0.46243925 0.62038485 0.45543815
- 0.6402828  0.48502148 0.46353294 0.5072005  0.60128476 0.59430525
- 0.50843677 0.535979   0.35223692 0.48462079 0.40050556 0.74772636
- 0.49877123 0.61182158] [1.1684831  1.17980514 1.4006637  1.41684629 1.25136425 1.6908429
- 1.38594142 1.4766896  1.46416279 1.425087   1.28002752 1.33166429
- 1.33416511 1.36171634 1.3940191  1.41816319 1.64176222 1.00011277
- 1.40971407 1.28206591]
-Mean:  0.5392027919474092 1.365664835466636
-Std:  0.09412515312358397 0.15064687859308645
-Min:  0.352236920066073 1.0001127710400823
-Max:  0.7477263625338395 1.6908428963561342
-Test set RMSE= 1.2385644682335668  and R2= 0.5501343278678306
-Exp. validation set RMSE= 1.8766044557263362  and R2= 0.26256166718228635
+R2 and RMSE for dataset  0 :  [0.52305829 0.68251867 0.58806293 0.41982748 0.53220404 0.51003086
+ 0.58241763 0.54428919 0.45004736 0.4792154  0.57592165 0.572026
+ 0.57734374 0.5491394  0.25092279 0.42054666 0.43684507 0.69855641
+ 0.57989423 0.5056082 ] [1.28042459 1.16532261 1.320718   1.4719313  1.38912142 1.60385099
+ 1.49325973 1.38911859 1.48245145 1.4649922  1.32011248 1.36774064
+ 1.23712487 1.3422672  1.49907692 1.50373738 1.59122511 1.09324138
+ 1.29060208 1.44687259]
+Mean:  0.5239238000929644 1.3876595778189458
+Std:  0.09667685332985525 0.13076542937689245
+Min:  0.2509227921813655 1.0932413815147357
+Max:  0.6985564139176359 1.603850991995379
+Test set RMSE= 1.093782292173194  and R2= 0.6491613775156464
+New dataset RMSE= 1.9426782806743375  and R2= 0.20971817859834951
 
 '''

@@ -280,7 +280,8 @@ def RF_feature_analysis(X, y, groups = None, groups_only_for_plotting = False,
                                           max_features = max_features,
                                           bootstrap = bootstrap,
                                           n_jobs = -2, criterion='mse',
-                                          max_samples = max_samples)
+                                          max_samples = max_samples,
+                                          random_state=random_state)
     
     #regressor = RandomForestRegressor(n_jobs = -2, criterion='mse')
     #print(X_train.shape, y_train.shape)

@@ -61,14 +61,14 @@ def analyze_GP_for_multiple_seeds(list_X, list_y, ho_params = None, n_seeds = 20
             else:
                 saveas_temp = saveas
             if ho_params is None:
-                feature_weights, top_feature_weights, regressor, R2, RMSE, scaler, X_test, y_test, y_pred, X_train, y_train = GP_feature_analysis(
+                feature_weights, top_feature_weights, regressor, R2, RMSE, scaler, X_test, y_test, y_pred, X_train, y_train, std_pred = GP_feature_analysis(
                         list_X[j], list_y[j], groups=groups,
                         groups_only_for_plotting = groups_only_for_plotting,
                         test_indices = None, test_proportion = test_proportion,
                         top_n = top_n, i='', random_state = i,
                         sample_weighing = False, plotting=plotting, saveas = saveas_temp, title = title_temp)
             else:
-                feature_weights, top_feature_weights, regressor, R2, RMSE, scaler, X_test, y_test, y_pred, X_train, y_train = GP_feature_analysis(
+                feature_weights, top_feature_weights, regressor, R2, RMSE, scaler, X_test, y_test, y_pred, X_train, y_train, std_pred = GP_feature_analysis(
                         list_X[j], list_y[j], groups=groups,
                         groups_only_for_plotting = groups_only_for_plotting,
                         test_indices = None, test_proportion = test_proportion,
@@ -234,9 +234,10 @@ def GP_feature_analysis(X, y, groups = None, groups_only_for_plotting = False,
     #y_train_scaled = y_train
     #y_test_scaled = y_test
     kernel = Matern()
-    regressor = GaussianProcessRegressor(kernel=kernel, random_state=None, alpha=1e-3, n_restarts_optimizer = 50, normalize_y = True).fit(X_train_scaled, y_train_scaled)
+    regressor = GaussianProcessRegressor(kernel=kernel, random_state=random_state, alpha=1e-3, n_restarts_optimizer = 50, normalize_y = True
+                                         ).fit(X_train_scaled, y_train_scaled)
     
-    R2, RMSE, y_pred = predict_plot_GP(regressor, X_test, y_test, scaler_train,
+    R2, RMSE, y_pred, std_pred = predict_plot_GP(regressor, X_test, y_test, scaler_train,
                                        plotting=plotting, title=title, 
                                        groups = groups, saveas = saveas)
     feature_weight = np.zeros(X_train.columns.shape)#regressor.feature_importances_
@@ -290,19 +291,24 @@ def GP_feature_analysis(X, y, groups = None, groups_only_for_plotting = False,
     top_feature_weights = feature_weights.loc[:, top_features].copy()
     #pd.DataFrame((feature_weights.loc[0,top_features].values).reshape((1, len(top_features))), columns = top_features, index = [0])
     
-    return feature_weights, top_feature_weights, regressor, R2, RMSE, scaler_train, X_test, y_test, y_pred, X_train, y_train
+    return feature_weights, top_feature_weights, regressor, R2, RMSE, scaler_train, X_test, y_test, y_pred, X_train, y_train, std_pred
 
 def predict_plot_GP(regressor, X_test, y_test, scaler, plotting=True, title=None, 
                     groups = None, saveas = ''):
     
     X_test_scaled, y_test_scaled = scale(X_test, y_test, scaler)
     
-    y_pred_scaled_array = regressor.predict(X_test_scaled)
+    y_pred_scaled_array, std_pred_scaled_array = regressor.predict(X_test_scaled, return_std=True)
     
     y_pred_scaled = y_test.copy()
     y_pred_scaled.iloc[:,-1] = y_pred_scaled_array
-        
+      
+    std_pred_scaled = y_test.copy()
+    std_pred_scaled.iloc[:,-1] = std_pred_scaled_array
+    
+    
     X_pred, y_pred = inverseScale(X_test_scaled, y_pred_scaled, scaler)
+    X_pred, std_pred = inverseScale(X_test_scaled, std_pred_scaled, scaler)
     
     R2 = sklearn.metrics.r2_score(y_test, y_pred)
     mse = sklearn.metrics.mean_squared_error(y_test, y_pred)
@@ -322,4 +328,4 @@ def predict_plot_GP(regressor, X_test, y_test, scaler, plotting=True, title=None
                      title = title_temp,
                      groups=None, saveas = saveas)
     
-    return R2, RMSE, y_pred
+    return R2, RMSE, y_pred, std_pred

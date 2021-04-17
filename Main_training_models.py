@@ -7,11 +7,10 @@ Created on Wed Oct 28 13:25:28 2020
 """
 
 from Functions_downselection_training_RF import define_groups_yvalue
-from Main_downselection import RF_train_test_newdata, fetch_csv
 from Downselection_xgb import XGB_train_test_newdata
 from Downselection_gp import GP_train_test_newdata
+from Main_downselection import RF_train_test_newdata, fetch_csv
 
-import pandas as pd
 from set_figure_defaults import FigureDefaults
 
 def fetch_refdata(path_x = './Data/Reference_data_files/Fingerprints/',
@@ -28,31 +27,36 @@ def fetch_refdata(path_x = './Data/Reference_data_files/Fingerprints/',
     y_selfies_test = fetch_csv(path_x +'y_selfies_test_seed3').iloc[:,[-1]]
     y_selfies_newdata = fetch_csv(path_x +'y_selfies_newdata').iloc[:,[-1]]
     
-    X_morgan_train = fetch_csv(path_x + 'x_morganfromdmpnn_train_seed3')
+    X_morgan_train = fetch_csv(path_x + 'x_morganfromdmpnn_train_seed3', index_col=None)
     X_morgan_train.index = y_refdata_train.index
-    X_morgancount_train = fetch_csv(path_x + 'x_morgancountfromdmpnn_train_seed3')
+    X_morgan_train.drop(columns=['smiles'], inplace=True)
+    X_morgancount_train = fetch_csv(path_x + 'x_morgancountfromdmpnn_train_seed3', index_col=None)
     X_morgancount_train.index = y_refdata_train.index
-    X_rdkit_train = fetch_csv(path_x + 'x_rdkitfromdmpnn_train_seed3')
+    X_morgancount_train.drop(columns=['smiles'], inplace=True)
+    X_rdkit_train = fetch_csv(path_x + 'x_rdkitfromdmpnn_train_seed3', index_col=None)
     X_rdkit_train.index = y_refdata_train.index
-    X_opt2_train = fetch_csv(path_x + 'x_optfromdmpnn_train_seed3')
-    X_opt2_train.index = y_refdata_train.index
+    X_rdkit_train.drop(columns=['smiles'], inplace=True)
     
-    X_selfies_train = fetch_csv(path_x + 'x_selfies_train_seed3')
-    X_smiles_train = fetch_csv(path_x + 'x_smiles_train_seed3')
+    X_selfies_train = fetch_csv(path_x + 'x_selfies_train_seed3', index_col=None)
+    X_smiles_train = fetch_csv(path_x + 'x_smiles_train_seed3', index_col=None)
 
-    X_morgan_test = fetch_csv(path_x + 'x_morganfromdmpnn_test_seed3')
-    X_morgancount_test = fetch_csv(path_x + 'x_morgancountfromdmpnn_test_seed3')
-    X_rdkit_test = fetch_csv(path_x + 'x_rdkitfromdmpnn_test_seed3')
-    X_opt2_test = fetch_csv(path_x + 'x_optfromdmpnn_test_seed3')
-    X_selfies_test = fetch_csv(path_x + 'x_selfies_test_seed3')
-    X_smiles_test = fetch_csv(path_x + 'x_smiles_test_seed3')
+    X_morgan_test = fetch_csv(path_x + 'x_morganfromdmpnn_test_seed3', index_col=None)
+    X_morgan_test.drop(columns=['smiles'], inplace=True)
+    X_morgancount_test = fetch_csv(path_x + 'x_morgancountfromdmpnn_test_seed3', index_col=None)
+    X_morgancount_test.drop(columns=['smiles'], inplace=True)
+    X_rdkit_test = fetch_csv(path_x + 'x_rdkitfromdmpnn_test_seed3', index_col=None)
+    X_rdkit_test.drop(columns=['smiles'], inplace=True)
+    X_selfies_test = fetch_csv(path_x + 'x_selfies_test_seed3', index_col=None)
+    X_smiles_test = fetch_csv(path_x + 'x_smiles_test_seed3', index_col=None)
 
-    X_morgan_newdata = fetch_csv(path_x + 'x_morganfromdmpnn_newdata_seed3')
-    X_morgancount_newdata = fetch_csv(path_x + 'x_morgancountfromdmpnn_newdata_seed3')
-    X_rdkit_newdata = fetch_csv(path_x + 'x_rdkitfromdmpnn_newdata_seed3')
-    X_opt2_newdata = fetch_csv(path_x + 'x_optfromdmpnn_newdata_seed3')
-    X_selfies_newdata = fetch_csv(path_x + 'x_selfies_newdata')
-    X_smiles_newdata = fetch_csv(path_x + 'x_smiles_newdata')
+    X_morgan_newdata = fetch_csv(path_x + 'x_morganfromdmpnn_newdata', index_col=None)
+    X_morgan_newdata.drop(columns=['smiles'], inplace=True)
+    X_morgancount_newdata = fetch_csv(path_x + 'x_morgancountfromdmpnn_newdata', index_col=None)
+    X_morgancount_newdata.drop(columns=['smiles'], inplace=True)
+    X_rdkit_newdata = fetch_csv(path_x + 'x_rdkitfromdmpnn_newdata', index_col=None)
+    X_rdkit_newdata.drop(columns=['smiles'], inplace=True)
+    X_selfies_newdata = fetch_csv(path_x + 'x_selfies_newdata', index_col=None)
+    X_smiles_newdata = fetch_csv(path_x + 'x_smiles_newdata', index_col=None)
     
     # Drop one mol with nans in morgan and rdkit datasets.    
     y_refdata_train = y_refdata_train.drop(X_morgan_train[(X_morgan_train=='Invalid SMILES').any(axis=1)].index)
@@ -60,7 +64,6 @@ def fetch_refdata(path_x = './Data/Reference_data_files/Fingerprints/',
     X_rdkit_train=X_rdkit_train.drop(X_morgan_train[(X_morgan_train=='Invalid SMILES').any(axis=1)].index)
     #X_smiles_train=X_smiles_test.drop(X_morgan_test[X_morgan_test.isnull().any(axis=1)].index)
     #X_selfies_train=X_selfies_test.drop(X_morgan_test[X_morgan_test.isnull().any(axis=1)].index)
-    X_opt2_train=X_opt2_train.drop(X_morgan_train[(X_morgan_train=='Invalid SMILES').any(axis=1)].index)
     X_morgan_train=X_morgan_train.drop(X_morgan_train[(X_morgan_train=='Invalid SMILES').any(axis=1)].index)
     
     groups_refdata_train =  define_groups_yvalue(y_refdata_train)
@@ -73,7 +76,6 @@ def fetch_refdata(path_x = './Data/Reference_data_files/Fingerprints/',
                     X_selfies_train, X_selfies_test, X_selfies_newdata,
                     X_smiles_train, X_smiles_test, X_smiles_newdata,
                     X_morgancount_train, X_morgancount_test, X_morgancount_newdata,
-                    X_opt2_train, X_opt2_test, X_opt2_newdata,
                     ]
     
     all_refdata_y = [y_refdata_train, y_refdata_test, y_refdata_newdata, groups_refdata_train,
@@ -86,20 +88,20 @@ def fetch_refdata(path_x = './Data/Reference_data_files/Fingerprints/',
 def fetch_downselected_data(path_x = './Data/Downselection_data_files/',
                   path_y = './Data/Downselection_data_files/'):
     
-    X_init_train = fetch_csv(path_x + 'x_init_train_seed3')
-    X_var_train = fetch_csv(path_x + 'x_var_train_seed3')
-    X_cor_train = fetch_csv(path_x + 'x_cor_train_seed3')
-    X_opt_train = fetch_csv(path_x + 'x_opt_train_seed3')
+    X_init_train = fetch_csv(path_x + 'x_init_train_seed3', index_col=None)
+    X_var_train = fetch_csv(path_x + 'x_var_train_seed3', index_col=None)
+    X_cor_train = fetch_csv(path_x + 'x_cor_train_seed3', index_col=None)
+    X_opt_train = fetch_csv(path_x + 'x_opt_train_seed3', index_col=None)
 
-    X_init_test = fetch_csv(path_x + 'x_init_test_seed3')
-    X_var_test = fetch_csv(path_x + 'x_var_test_seed3')
-    X_cor_test = fetch_csv(path_x + 'x_cor_test_seed3')
-    X_opt_test = fetch_csv(path_x + 'x_opt_test_seed3')
+    X_init_test = fetch_csv(path_x + 'x_init_test_seed3', index_col=None)
+    X_var_test = fetch_csv(path_x + 'x_var_test_seed3', index_col=None)
+    X_cor_test = fetch_csv(path_x + 'x_cor_test_seed3', index_col=None)
+    X_opt_test = fetch_csv(path_x + 'x_opt_test_seed3', index_col=None)
 
-    X_init_newdata = fetch_csv(path_x + 'x_init_newdata')
-    X_var_newdata = fetch_csv(path_x + 'x_var_newdata')
-    X_cor_newdata = fetch_csv(path_x + 'x_cor_newdata')
-    X_opt_newdata = fetch_csv(path_x + 'x_opt_newdata')
+    X_init_newdata = fetch_csv(path_x + 'x_init_newdata', index_col=None)
+    X_var_newdata = fetch_csv(path_x + 'x_var_newdata', index_col=None)
+    X_cor_newdata = fetch_csv(path_x + 'x_cor_newdata', index_col=None)
+    X_opt_newdata = fetch_csv(path_x + 'x_opt_newdata', index_col=None)
     
     # All the files have the same y data.
     y_train = fetch_csv(path_y + 'y_opt_train_seed3').iloc[:,[-1]] # Dropping smiles
@@ -171,8 +173,8 @@ if __name__ == "__main__":
                     X_rdkit_train, X_rdkit_test, X_rdkit_newdata,
                     X_selfies_train, X_selfies_test, X_selfies_newdata,
                     X_smiles_train, X_smiles_test, X_smiles_newdata,
-                    X_morgancount_train, X_morgancount_test, X_morgancount_newdata,
-                    X_opt2_train, X_opt2_test, X_opt2_newdata] = all_refdata_x
+                    X_morgancount_train, X_morgancount_test, X_morgancount_newdata
+                    ] = all_refdata_x
     
     [y_refdata_train, y_refdata_test, y_refdata_newdata, groups_refdata_train,
                      y_smiles_train, y_smiles_test, y_smiles_newdata, groups_smiles_train,
@@ -191,62 +193,56 @@ if __name__ == "__main__":
     mystyle = FigureDefaults('nature_comp_mat_tc')
     
     print('\nRF and Morgan:\n')
-    cv_results_rf_morgan, test_rf_results_morgan, val_rf_results_morgan = RF_train_test_newdata(
+    cv_results_rf_morgan, test_rf_results_morgan, newdata_rf_results_morgan = RF_train_test_newdata(
             [X_morgan_train, X_morgan_test, X_morgan_newdata],
             [y_refdata_train, y_refdata_test, y_refdata_newdata], groups_refdata_train, ho_rf_morgan,
             saveas='./Results/rf_morgan_seed' + str(random_state),
             random_state=random_state)
     print('\nRF and Morgan count:\n')
-    cv_results_rf_morgancount, test_results_rf_morgancount, val_results_rf_morgancount = RF_train_test_newdata(
+    cv_results_rf_morgancount, test_results_rf_morgancount, newdata_results_rf_morgancount = RF_train_test_newdata(
             [X_morgancount_train, X_morgancount_test, X_morgancount_newdata],
             [y_refdata_train, y_refdata_test, y_refdata_newdata], groups_refdata_train, ho_rf_morgancount,
             saveas='./Results/rf_morgancount_seed'  + str(random_state),
             random_state=random_state)
     print('\nRF and Rdkit:\n')
-    cv_results_rf_rdkit, test_results_rf_rdkit, val_results_rf_rdkit = RF_train_test_newdata(
+    cv_results_rf_rdkit, test_results_rf_rdkit, newdata_results_rf_rdkit = RF_train_test_newdata(
             [X_rdkit_train, X_rdkit_test, X_rdkit_newdata],
             [y_refdata_train, y_refdata_test, y_refdata_newdata], groups_refdata_train, ho_rf_rdkit,
             saveas='./Results/rf_rdkit_seed'  + str(random_state),
             random_state=random_state)
-    print('\nRF and Opt2:\n')
-    cv_results_rf_opt2, test_results_rf_opt2, val_results_rf_opt2 = RF_train_test_newdata(
-            [X_opt2_train, X_opt2_test, X_opt2_newdata],
-            [y_refdata_train, y_refdata_test, y_refdata_newdata], groups_refdata_train, ho_rf_opt,
-            saveas='./Results/rf_optfromdmpnn__seed'  + str(random_state),
-            random_state=random_state)
     print('\nRF and Selfies:\n')
-    cv_results_rf_selfies, test_results_rf_selfies, val_results_rf_selfies = RF_train_test_newdata(
+    cv_results_rf_selfies, test_results_rf_selfies, newdata_results_rf_selfies = RF_train_test_newdata(
             [X_selfies_train, X_selfies_test, X_selfies_newdata],
             [y_selfies_train, y_selfies_test, y_selfies_newdata], groups_selfies_train, ho_rf_selfies,
             saveas='./Results/rf_selfies_seed' + str(random_state),
             random_state=random_state)
     print('\nRF and Smiles:\n')
-    cv_results_rf_smiles, test_results_rf_smiles, val_results_rf_smiles = RF_train_test_newdata(
+    cv_results_rf_smiles, test_results_rf_smiles, newdata_results_rf_smiles = RF_train_test_newdata(
             [X_smiles_train, X_smiles_test, X_smiles_newdata],
             [y_smiles_train, y_smiles_test, y_smiles_newdata], groups_smiles_train, ho_rf_smiles,
             saveas='./Results/rf_smiles_seed' + str(random_state),
             random_state=random_state)
     ###
     print('\nRF and Init:\n')
-    cv_results_rf_init, test_results_rf_init, val_results_rf_init = RF_train_test_newdata(
+    cv_results_rf_init, test_results_rf_init, newdata_results_rf_init = RF_train_test_newdata(
             [X_init_train, X_init_test, X_init_newdata],
             [y_train, y_test, y_newdata], groups_train, ho_rf_init,
             saveas='./Results/rf_init_seed' + str(random_state),
             random_state=random_state)
     print('\nRF and Var:\n')
-    cv_results_rf_var, test_results_rf_var, val_results_rf_var = RF_train_test_newdata(
+    cv_results_rf_var, test_results_rf_var, newdata_results_rf_var = RF_train_test_newdata(
             [X_var_train, X_var_test, X_var_newdata],
             [y_train, y_test, y_newdata], groups_train, ho_rf_var,
             saveas='./Results/rf_var_seed'  + str(random_state),
             random_state=random_state)
     print('\nRF and Cor:\n')
-    cv_results_rf_cor, test_results_rf_cor, val_results_rf_cor = RF_train_test_newdata(
+    cv_results_rf_cor, test_results_rf_cor, newdata_results_rf_cor = RF_train_test_newdata(
             [X_cor_train, X_cor_test, X_cor_newdata],
             [y_train, y_test, y_newdata], groups_train, ho_rf_cor,
             saveas='./Results/rf_cor_seed'  + str(random_state),
             random_state=random_state)
     print('\nRF and Opt:\n')
-    cv_results_rf_opt, test_results_rf_opt, val_results_rf_opt = RF_train_test_newdata(
+    cv_results_rf_opt, test_results_rf_opt, newdata_results_rf_opt = RF_train_test_newdata(
             [X_opt_train, X_opt_test, X_opt_newdata],
             [y_train, y_test, y_newdata], groups_train, ho_rf_opt,
             saveas='./Results/rf_opt_seed'  + str(random_state),
@@ -255,62 +251,56 @@ if __name__ == "__main__":
     # Train XGB models.
     
     print('\nXGB and Morgan:\n')
-    cv_results_xgb_morgan, test_xgb_results_morgan, val_xgb_results_morgan = XGB_train_test_newdata(
+    cv_results_xgb_morgan, test_xgb_results_morgan, newdata_xgb_results_morgan = XGB_train_test_newdata(
             [X_morgan_train, X_morgan_test, X_morgan_newdata],
             [y_refdata_train, y_refdata_test, y_refdata_newdata], groups_refdata_train, ho_xgb_morgan,
             saveas='./Results/xgb_morgan_seed' + str(random_state),
             random_state=random_state)
     print('\nXGB and Morgan count:\n')
-    cv_results_xgb_morgancount, test_results_xgb_morgancount, val_results_xgb_morgancount = XGB_train_test_newdata(
+    cv_results_xgb_morgancount, test_results_xgb_morgancount, newdata_results_xgb_morgancount = XGB_train_test_newdata(
             [X_morgancount_train, X_morgancount_test, X_morgancount_newdata],
             [y_refdata_train, y_refdata_test, y_refdata_newdata], groups_refdata_train, ho_xgb_morgancount,
             saveas='./Results/xgb_morgancount_seed'  + str(random_state),
             random_state=random_state)
     print('\nXGB and Rdkit:\n')
-    cv_results_xgb_rdkit, test_results_xgb_rdkit, val_results_xgb_rdkit = XGB_train_test_newdata(
+    cv_results_xgb_rdkit, test_results_xgb_rdkit, newdata_results_xgb_rdkit = XGB_train_test_newdata(
             [X_rdkit_train, X_rdkit_test, X_rdkit_newdata],
             [y_refdata_train, y_refdata_test, y_refdata_newdata], groups_refdata_train, ho_xgb_rdkit,
             saveas='./Results/xgb_rdkit_seed'  + str(random_state),
             random_state=random_state)
-    print('\nXGB and Opt2:\n')
-    cv_results_xgb_opt2, test_results_xgb_opt2, val_results_xgb_opt2 = XGB_train_test_newdata(
-            [X_opt2_train, X_opt2_test, X_opt2_newdata],
-            [y_refdata_train, y_refdata_test, y_refdata_newdata], groups_refdata_train, ho_xgb_opt,
-            saveas='./Results/xgb_optfromdmpnn__seed'  + str(random_state),
-            random_state=random_state)
     print('\nXGB and Selfies:\n')
-    cv_results_xgb_selfies, test_results_xgb_selfies, val_results_xgb_selfies = XGB_train_test_newdata(
+    cv_results_xgb_selfies, test_results_xgb_selfies, newdata_results_xgb_selfies = XGB_train_test_newdata(
             [X_selfies_train, X_selfies_test, X_selfies_newdata],
             [y_selfies_train, y_selfies_test, y_selfies_newdata], groups_selfies_train, ho_xgb_selfies,
             saveas='./Results/xgb_selfies_seed' + str(random_state),
             random_state=random_state)
     print('\nXGB and Smiles:\n')
-    cv_results_xgb_smiles, test_results_xgb_smiles, val_results_xgb_smiles = XGB_train_test_newdata(
+    cv_results_xgb_smiles, test_results_xgb_smiles, newdata_results_xgb_smiles = XGB_train_test_newdata(
             [X_smiles_train, X_smiles_test, X_smiles_newdata],
             [y_smiles_train, y_smiles_test, y_smiles_newdata], groups_smiles_train, ho_xgb_smiles,
             saveas='./Results/xgb_smiles_seed' + str(random_state),
             random_state=random_state)
     ###
     print('\nXGB and Init:\n')
-    cv_results_xgb_init, test_results_xgb_init, val_results_xgb_init = XGB_train_test_newdata(
+    cv_results_xgb_init, test_results_xgb_init, newdata_results_xgb_init = XGB_train_test_newdata(
             [X_init_train, X_init_test, X_init_newdata],
             [y_train, y_test, y_newdata], groups_train, ho_xgb_init,
             saveas='./Results/xgb_init_seed' + str(random_state),
             random_state=random_state)
     print('\nXGB and Var:\n')
-    cv_results_xgb_var, test_results_xgb_var, val_results_xgb_var = XGB_train_test_newdata(
+    cv_results_xgb_var, test_results_xgb_var, newdata_results_xgb_var = XGB_train_test_newdata(
             [X_var_train, X_var_test, X_var_newdata],
             [y_train, y_test, y_newdata], groups_train, ho_xgb_var,
             saveas='./Results/xgb_var_seed'  + str(random_state),
             random_state=random_state)
     print('\nXGB and Cor:\n')
-    cv_results_xgb_cor, test_results_xgb_cor, val_results_xgb_cor = XGB_train_test_newdata(
+    cv_results_xgb_cor, test_results_xgb_cor, newdata_results_xgb_cor = XGB_train_test_newdata(
             [X_cor_train, X_cor_test, X_cor_newdata],
             [y_train, y_test, y_newdata], groups_train, ho_xgb_cor,
             saveas='./Results/xgb_cor_seed'  + str(random_state),
             random_state=random_state)
     print('\nXGB and Opt:\n')
-    cv_results_xgb_opt, test_results_xgb_opt, val_results_xgb_opt = XGB_train_test_newdata(
+    cv_results_xgb_opt, test_results_xgb_opt, newdata_results_xgb_opt = XGB_train_test_newdata(
             [X_opt_train, X_opt_test, X_opt_newdata],
             [y_train, y_test, y_newdata], groups_train, ho_xgb_opt,
             saveas='./Results/xgb_opt_seed'  + str(random_state),
@@ -321,62 +311,56 @@ if __name__ == "__main__":
     
     print('Running GP takes longer because kernel optimization is integrated into the implementation.\n')
     print('\nGP and Morgan:\n')
-    cv_results_gp_morgan, test_gp_results_morgan, val_gp_results_morgan = GP_train_test_newdata(
+    cv_results_gp_morgan, test_gp_results_morgan, newdata_gp_results_morgan = GP_train_test_newdata(
             [X_morgan_train, X_morgan_test, X_morgan_newdata],
             [y_refdata_train, y_refdata_test, y_refdata_newdata], groups_refdata_train, None,
             saveas='./Results/gp_morgan_seed' + str(random_state),
             random_state=random_state)
     print('\nGP and Morgan count:\n')
-    cv_results_gp_morgancount, test_results_gp_morgancount, val_results_gp_morgancount = GP_train_test_newdata(
+    cv_results_gp_morgancount, test_results_gp_morgancount, newdata_results_gp_morgancount = GP_train_test_newdata(
             [X_morgancount_train, X_morgancount_test, X_morgancount_newdata],
             [y_refdata_train, y_refdata_test, y_refdata_newdata], groups_refdata_train, None,
             saveas='./Results/gp_morgancount_seed'  + str(random_state),
             random_state=random_state)
     print('\nGP and Rdkit:\n')
-    cv_results_gp_rdkit, test_results_gp_rdkit, val_results_gp_rdkit = GP_train_test_newdata(
+    cv_results_gp_rdkit, test_results_gp_rdkit, newdata_results_gp_rdkit = GP_train_test_newdata(
             [X_rdkit_train, X_rdkit_test, X_rdkit_newdata],
             [y_refdata_train, y_refdata_test, y_refdata_newdata], groups_refdata_train, None,
             saveas='./Results/gp_rdkit_seed'  + str(random_state),
             random_state=random_state)
-    print('\nGP and Opt2:\n')
-    cv_results_gp_opt2, test_results_gp_opt2, val_results_gp_opt2 = GP_train_test_newdata(
-            [X_opt2_train, X_opt2_test, X_opt2_newdata],
-            [y_refdata_train, y_refdata_test, y_refdata_newdata], groups_refdata_train, None,
-            saveas='./Results/gp_optfromdmpnn__seed'  + str(random_state),
-            random_state=random_state)
     print('\nGP and Selfies:\n')
-    cv_results_gp_selfies, test_results_gp_selfies, val_results_gp_selfies = GP_train_test_newdata(
+    cv_results_gp_selfies, test_results_gp_selfies, newdata_results_gp_selfies = GP_train_test_newdata(
             [X_selfies_train, X_selfies_test, X_selfies_newdata],
             [y_selfies_train, y_selfies_test, y_selfies_newdata], groups_selfies_train, None,
             saveas='./Results/gp_selfies_seed' + str(random_state),
             random_state=random_state)
     print('\nGP and Smiles:\n')
-    cv_results_gp_smiles, test_results_gp_smiles, val_results_gp_smiles = GP_train_test_newdata(
+    cv_results_gp_smiles, test_results_gp_smiles, newdata_results_gp_smiles = GP_train_test_newdata(
             [X_smiles_train, X_smiles_test, X_smiles_newdata],
             [y_smiles_train, y_smiles_test, y_smiles_newdata], groups_smiles_train, None,
             saveas='./Results/gp_smiles_seed' + str(random_state),
             random_state=random_state)
     ###
     print('\nGP and Init:\n')
-    cv_results_gp_init, test_results_gp_init, val_results_gp_init = GP_train_test_newdata(
+    cv_results_gp_init, test_results_gp_init, newdata_results_gp_init = GP_train_test_newdata(
             [X_init_train, X_init_test, X_init_newdata],
             [y_train, y_test, y_newdata], groups_train, None,
             saveas='./Results/gp_init_seed' + str(random_state),
             random_state=random_state)
     print('\nGP and Var:\n')
-    cv_results_gp_var, test_results_gp_var, val_results_gp_var = GP_train_test_newdata(
+    cv_results_gp_var, test_results_gp_var, newdata_results_gp_var = GP_train_test_newdata(
             [X_var_train, X_var_test, X_var_newdata],
             [y_train, y_test, y_newdata], groups_train, None,
             saveas='./Results/gp_var_seed'  + str(random_state),
             random_state=random_state)
     print('\nGP and Cor:\n')
-    cv_results_gp_cor, test_results_gp_cor, val_results_gp_cor = GP_train_test_newdata(
+    cv_results_gp_cor, test_results_gp_cor, newdata_results_gp_cor = GP_train_test_newdata(
             [X_cor_train, X_cor_test, X_cor_newdata],
             [y_train, y_test, y_newdata], groups_train, None,
             saveas='./Results/gp_cor_seed'  + str(random_state),
             random_state=random_state)
     print('\nGP and Opt:\n')
-    cv_results_gp_opt, test_results_gp_opt, val_results_gp_opt = GP_train_test_newdata(
+    cv_results_gp_opt, test_results_gp_opt, newdata_results_gp_opt = GP_train_test_newdata(
             [X_opt_train, X_opt_test, X_opt_newdata],
             [y_train, y_test, y_newdata], groups_train, None,
             saveas='./Results/gp_opt_seed'  + str(random_state),
@@ -387,227 +371,196 @@ Print-outs from the code:
 
 RF and Morgan:
 
-R2 and RMSE for dataset  0 :  [0.28423206 0.13934164 0.25014359 0.20500426 0.48860361 0.34716933
- 0.6244426  0.17822921 0.4835597  0.25097172 0.53328562 0.63116263
- 0.32134946 0.32103329 0.41610592 0.13271096 0.31976102 0.58936074
- 0.03083938 0.32237079] [1.86123749 1.96028189 2.00760509 2.01773331 1.44966187 1.713239
- 1.38523051 1.86539156 1.39163614 1.81024825 1.40254348 1.26973332
- 1.64680028 1.8816762  1.2876987  1.83969018 1.79457694 1.27157071
- 2.22781561 1.9084698 ]
-Mean:  0.3434838779022107 1.6996420167690225
-Std:  0.1669223277288744 0.2827840126275429
-Min:  0.030839382466800846 1.2697333218834381
-Max:  0.6311626332193971 2.227815607539234
-Test set RMSE= 1.7242489747564358  and R2= 0.12814236746374796
-Exp. validation set RMSE= 1.9739896630790787  and R2= 0.18403793031106963
+R2 and RMSE for dataset  0 :  [0.35324023 0.11157975 0.22234895 0.23706851 0.42851296 0.35721269
+ 0.61277975 0.37337339 0.35830066 0.40675167 0.53552869 0.70608994
+ 0.48038213 0.49947573 0.39539813 0.1683513  0.41374536 0.71358585
+ 0.26959521 0.46971269] [1.7692417  1.99164695 2.04447411 1.97662432 1.53246681 1.70000942
+ 1.40657508 1.62891745 1.55124869 1.61104359 1.39916904 1.13344979
+ 1.44098637 1.61559767 1.31033387 1.80149358 1.66599799 1.06195844
+ 1.93402984 1.68828146]
+Mean:  0.4056516802928821 1.6131773084683871
+Std:  0.1574390650898225 0.26405700034790947
+Min:  0.11157975419664101 1.0619584367632287
+Max:  0.7135858485301332 2.0444741077194157
+Test set RMSE= 2.1405469634883425  and R2= -0.3436778014367048
+New dataset RMSE= 1.7086764410532187  and R2= 0.3886359665371606
 
 RF and Morgan count:
 
-R2 and RMSE for dataset  0 :  [0.33340535 0.12838825 0.29806282 0.15198674 0.4126414  0.18807379
- 0.64564197 0.15855963 0.3906628  0.42193635 0.5516372  0.59472185
- 0.24412865 0.28261535 0.31614689 0.0262934  0.29297546 0.5729984
- 0.03384305 0.39413659] [1.79616646 1.97271647 1.9423986  2.08392788 1.55360122 1.91062722
- 1.34556607 1.88758418 1.51162644 1.59029195 1.37469238 1.33098038
- 1.73796801 1.93417912 1.39356951 1.94929164 1.82956806 1.29665677
- 2.22436066 1.8045819 ]
-Mean:  0.3219427967999069 1.7235177461239495
-Std:  0.17516946046708756 0.27134290375695935
-Min:  0.026293396311242834 1.2966567716486213
-Max:  0.6456419744327226 2.2243606585002977
-Test set RMSE= 1.7819865058967466  and R2= 0.06877539378354958
-Exp. validation set RMSE= 1.9752655956949587  and R2= 0.18298275853302615
+R2 and RMSE for dataset  0 :  [0.44364831 0.20899232 0.27746212 0.2471814  0.52566026 0.29673909
+ 0.63508369 0.31752652 0.42792871 0.46863736 0.64774576 0.77437857
+ 0.41122445 0.48511582 0.46172944 0.22987911 0.47006865 0.65758501
+ 0.31392153 0.54736014] [1.64093121 1.87928861 1.97069559 1.96348023 1.3961518  1.7781808
+ 1.36546486 1.69995549 1.46467311 1.52470048 1.21848127 0.99308229
+ 1.53388471 1.63860933 1.23636738 1.73357332 1.58394878 1.16114557
+ 1.87442582 1.55978821]
+Mean:  0.44239341220673467 1.5608414439170968
+Std:  0.1544131686957441 0.2664997080416677
+Min:  0.20899232364280207 0.99308229114283
+Max:  0.7743785666959231 1.9706955861222353
+Test set RMSE= 1.9656871235737026  and R2= -0.13311609025907822
+New dataset RMSE= 1.72582667832005  and R2= 0.3763016732629928
 
 RF and Rdkit:
 
-R2 and RMSE for dataset  0 :  [ 0.2916046  -0.02627706  0.22686819  0.11107311  0.4266443   0.20843057
-  0.69695729  0.02153023  0.22317641  0.38920799  0.51965736  0.6101691
-  0.33513849  0.48276909  0.24302797 -0.11291249  0.22626622  0.58411686
-  0.01311847  0.35223936] [1.85162713 2.14059961 2.03852484 2.13360679 1.53497022 1.88652335
- 1.24433068 2.03548715 1.70677721 1.63469112 1.42287356 1.30536868
- 1.62998434 1.6423393  1.46617948 2.08397867 1.91393465 1.27966396
- 2.24809094 1.865935  ]
-Mean:  0.2911403036027812 1.7532743344624664
-Std:  0.21718979775311273 0.3035418267703119
-Min:  -0.11291249051561358 1.244330679635574
-Max:  0.6969572911985655 2.2480909360311774
-Test set RMSE= 1.7958527540445488  and R2= 0.054226652724518876
-Exp. validation set RMSE= 1.9141503344243531  and R2= 0.2327581041193748
-
-RF and Opt2:
-
-R2 and RMSE for dataset  0 :  [0.35921487 0.11886675 0.21745748 0.17580169 0.46338352 0.30012746
- 0.63889401 0.1254761  0.38959441 0.30669245 0.48843676 0.52572281
- 0.29697762 0.30322855 0.41681686 0.1714826  0.2473586  0.58834552
- 0.10584077 0.31368083] [1.7610508  1.9834622  2.05089397 2.05445779 1.48497756 1.77389192
- 1.3583173  1.92433421 1.51295108 1.74161434 1.46838657 1.43982987
- 1.67610959 1.90618841 1.28691453 1.79809891 1.88766698 1.27314159
- 2.13987692 1.92066799]
-Mean:  0.3276699823635971 1.7221416270208447
-Std:  0.15227546658998334 0.26294678773839153
-Min:  0.10584077319812424 1.2731415931870214
-Max:  0.6388940135484285 2.139876918862372
-Test set RMSE= 1.6685193009281207  and R2= 0.18359042300009842
-Exp. validation set RMSE= 1.88730979894085  and R2= 0.25412403597551514
+R2 and RMSE for dataset  0 :  [0.3056079  0.33285317 0.38583261 0.32318928 0.62464988 0.48953789
+ 0.67656577 0.27276633 0.40077319 0.48930945 0.65686048 0.62471621
+ 0.50536977 0.39966511 0.44209429 0.40415693 0.39506617 0.67361899
+ 0.26900347 0.48860039] [1.83323464 1.72589291 1.81690664 1.86172263 1.24195587 1.51495396
+ 1.2855142  1.75481625 1.4990332  1.49474786 1.2026136  1.28078125
+ 1.40591207 1.76936504 1.25871563 1.52485556 1.69233082 1.13363364
+ 1.93481311 1.65794237]
+Mean:  0.4580118651257017 1.5444870622546434
+Std:  0.13050261562711285 0.24428504380003574
+Min:  0.2690034718465548 1.1336336377907865
+Max:  0.6765657710780348 1.9348131050823247
+Test set RMSE= 1.39030530158433  and R2= 0.4331528353039604
+New dataset RMSE= 2.38331769949605  and R2= -0.1894442717086584
 
 RF and Selfies:
 
-R2 and RMSE for dataset  0 :  [-0.48091443  0.08831358 -0.06885233 -0.34651163 -0.05649507 -0.10580171
-  0.0689284  -0.32643273 -0.0814278  -0.02667372 -0.09583492  0.24797071
- -0.17597877 -0.01062965 -0.15523678 -0.15198319  0.1225508   0.01945467
-  0.0053727   0.09868318] [2.25624541 1.97473953 2.12742134 2.24240482 2.08759243 2.40945201
- 2.22974816 2.36993957 2.07881863 2.05694401 2.12207367 1.8130611
- 2.06357199 2.00961957 1.86164184 2.12024394 1.98622603 1.97172743
- 1.9858353  1.95358988]
-Mean:  -0.07157493400918459 2.0860448324533998
-Std:  0.1686095655016993 0.15142109642737686
-Min:  -0.4809144344579115 1.8130610965164276
-Max:  0.24797070762864537 2.40945200673015
-Test set RMSE= 1.8965890756361765  and R2= -0.054853408159087014
-Exp. validation set RMSE= 2.06597396903641  and R2= 0.10622148035868895
+R2 and RMSE for dataset  0 :  [-4.72807586e-01  1.28024753e-01 -1.16545121e-01 -3.15756713e-01
+ -8.11274581e-02 -1.25119144e-01  6.97451403e-02 -3.24845772e-01
+ -5.23383202e-02 -4.32725660e-04 -8.42065931e-02  2.47765320e-01
+ -1.44021114e-01 -2.10786810e-02 -1.76027127e-01 -7.26447182e-02
+  1.33478225e-01  2.84376108e-02 -5.51833550e-03  1.45252852e-01] [2.25006135 1.93125293 2.17436675 2.21664814 2.11178852 2.43040645
+ 2.22876997 2.36852144 2.05066881 2.0304869  2.11078456 1.81330866
+ 2.0353397  2.01998172 1.87831876 2.04592972 1.97381943 1.96267498
+ 1.99667801 1.90245104]
+Mean:  -0.06198827531445179 2.0766128924354383
+Std:  0.16991441698623452 0.15714476518984463
+Min:  -0.472807585817804 1.813308662836293
+Max:  0.24776532035782917 2.4304064484817225
+Test set RMSE= 1.8647375697991115  and R2= -0.019720294492755697
+New dataset RMSE= 2.074015777669788  and R2= 0.09924986814043768
 
 RF and Smiles:
 
-R2 and RMSE for dataset  0 :  [ 0.38474958 -0.07691696  0.21115456  0.14289028  0.26466289  0.21865286
-  0.45600758 -0.00667808  0.29219747  0.29157744  0.42390205  0.47011671
-  0.24075051  0.38061353  0.28765784 -0.16701964  0.34066829  0.47768353
-  0.11712096  0.34104305] [1.72560595 2.19277586 2.05913677 2.095075   1.73832561 1.87430254
- 1.66717163 2.06461922 1.62918983 1.76049673 1.55825634 1.52189669
- 1.74184734 1.7972211  1.42230111 2.1340365  1.7667834  1.43409243
- 2.12633637 1.88199192]
-Mean:  0.2545417217614492 1.8095731162798212
-Std:  0.1743271652321735 0.23254473024977007
-Min:  -0.16701963602193848 1.4223011086969821
-Max:  0.47768352765022226 2.192775856312539
-Test set RMSE= 1.7900208080929367  and R2= 0.060359386098037926
-Exp. validation set RMSE= 1.8320702428448985  and R2= 0.2971470625591003
+R2 and RMSE for dataset  0 :  [ 0.38308291 -0.09964291  0.18322415  0.15202925  0.27876978  0.17548889
+  0.41321967  0.04021111  0.31370945  0.31326979  0.46000305  0.46446107
+  0.24051927  0.38904605  0.31181041 -0.19620597  0.32329851  0.51853942
+  0.11549196  0.37847501] [1.72794165 2.21579191 2.0952733  2.08387564 1.72157063 1.92537769
+ 1.73149668 2.01596282 1.60424112 1.73333339 1.50864269 1.52999701
+ 1.74211256 1.78494521 1.39798101 2.16055708 1.78990464 1.37686275
+ 2.12829711 1.82775732]
+Mean:  0.2579400429553035 1.8050961114676045
+Std:  0.1819854911922821 0.24515122391837485
+Min:  -0.19620597362464975 1.3768627516574932
+Max:  0.5185394191995317 2.215791911596066
+Test set RMSE= 1.8016904443083193  and R2= 0.04806790114020276
+New dataset RMSE= 1.8315244479943749  and R2= 0.2975657761690005
 
 RF and Init:
 
-R2 and RMSE for dataset  0 :  [0.38221578 0.58671488 0.36498201 0.21691427 0.35915033 0.206016
- 0.53444352 0.24553445 0.22873512 0.51854006 0.32620831 0.43331238
- 0.27214572 0.36328262 0.16952127 0.24789722 0.33920274 0.65264306
- 0.24380261 0.43979684] [1.45726911 1.3295723  1.63978788 1.71006894 1.62588588 2.0416699
- 1.57670506 1.7873696  1.7555759  1.4085956  1.66399    1.57386299
- 1.62346191 1.59511201 1.5784284  1.71317354 1.72366077 1.17354846
- 1.73153241 1.54016566]
-Mean:  0.3565529601026409 1.612471815797814
-Std:  0.13243881072136185 0.17790195373711923
-Min:  0.16952126606855034 1.1735484598372683
-Max:  0.6526430612589904 2.0416699004963803
-Test set RMSE= 1.1298118151545105  and R2= 0.6256672323569707
-Exp. validation set RMSE= 2.20316474785942  and R2= -0.01642226668509661
+R2 and RMSE for dataset  0 :  [0.3182764  0.62954513 0.39785816 0.26466231 0.29064215 0.16805094
+ 0.52915618 0.3001113  0.33664034 0.45540162 0.36574063 0.38300059
+ 0.32354466 0.32397885 0.16993702 0.25946456 0.3680365  0.68743985
+ 0.23366259 0.44481329] [1.5308249  1.25879419 1.59677624 1.65711397 1.71058502 2.08991209
+ 1.58563314 1.72150841 1.62814232 1.49811248 1.61443785 1.64224306
+ 1.56509048 1.64360697 1.57803325 1.69994819 1.68563554 1.11321703
+ 1.74310301 1.5332543 ]
+Mean:  0.36249815311910116 1.6047986213136163
+Std:  0.13193774773709718 0.18536653418976626
+Min:  0.16805094256102304 1.1132170260401504
+Max:  0.6874398525627456 2.089912091824589
+Test set RMSE= 1.1965045888440924  and R2= 0.58016914043256
+New dataset RMSE= 2.199879962074483  and R2= -0.013393677475660892
 
 RF and Var:
 
-R2 and RMSE for dataset  0 :  [0.41219084 0.6406651  0.37038921 0.3225591  0.28636127 0.29002312
- 0.52192951 0.28405205 0.1803601  0.41950964 0.41149777 0.42049064
- 0.26009531 0.4323679  0.12826108 0.31927647 0.36691936 0.67397996
- 0.35114641 0.43299735] [1.42147599 1.23975759 1.63279153 1.59054028 1.71573883 1.93064203
- 1.5977552  1.74114677 1.80979498 1.54669169 1.55511296 1.59156832
- 1.63684582 1.50609133 1.61716318 1.6298519  1.68712474 1.13693383
- 1.60393363 1.54948438]
-Mean:  0.37625361022998344 1.5870222505663647
-Std:  0.12976369639892063 0.17131563570728
-Min:  0.12826108230788613 1.1369338305198957
-Max:  0.6739799557093158 1.9306420290393183
-Test set RMSE= 1.2029036317004402  and R2= 0.5756665257600855
-Exp. validation set RMSE= 2.0319847350486975  and R2= 0.13538830679454983
+R2 and RMSE for dataset  0 :  [0.38218409 0.63018068 0.3453451  0.31084226 0.2742482  0.27882303
+ 0.50457917 0.29126392 0.16316969 0.41755513 0.37870902 0.34348273
+ 0.33551604 0.39228836 0.05395678 0.2472965  0.31313895 0.61342098
+ 0.33218534 0.39854688] [1.45730648 1.25771394 1.66494875 1.60423609 1.73023876 1.94581066
+ 1.62649003 1.73235514 1.82867503 1.54929337 1.59784781 1.69401846
+ 1.55117978 1.55835576 1.68467494 1.71385758 1.75732515 1.23803288
+ 1.62720029 1.59586279]
+Mean:  0.35033664294275735 1.6207711838430332
+Std:  0.12907091976027885 0.1631536607390511
+Min:  0.053956780446867136 1.2380328760579873
+Max:  0.6301806804676722 1.9458106583239292
+Test set RMSE= 1.1893163228864636  and R2= 0.5851984410896836
+New dataset RMSE= 2.1192762027840764  and R2= 0.059507480510009314
 
 RF and Cor:
 
-R2 and RMSE for dataset  0 :  [0.34979529 0.63291554 0.30652309 0.35393034 0.43105521 0.28218975
- 0.55346519 0.31003569 0.14756295 0.46816861 0.40250109 0.46855071
- 0.33886773 0.4487754  0.26840845 0.36483199 0.33981247 0.6822132
- 0.34810203 0.4965054 ] [1.49501796 1.25305483 1.71360477 1.55327601 1.53195863 1.94126346
- 1.5441587  1.70925937 1.84564849 1.48044826 1.56695472 1.52414391
- 1.54726273 1.48416481 1.48147718 1.57437095 1.72286536 1.12248609
- 1.607692   1.46013182]
-Mean:  0.39971050711523404 1.557962002718001
-Std:  0.12392283392717036 0.1764095939228251
-Min:  0.1475629505466991 1.1224860853016365
-Max:  0.6822131990205685 1.9412634625546972
-Test set RMSE= 1.2536685451308631  and R2= 0.5390953603957376
-Exp. validation set RMSE= 1.9344140939933017  and R2= 0.21642762194463083
+R2 and RMSE for dataset  0 :  [0.44885599 0.60064301 0.343755   0.33467184 0.35753398 0.33458858
+ 0.49800581 0.41940865 0.20030442 0.36750817 0.43065155 0.43034348
+ 0.41704058 0.44000334 0.25613455 0.4095711  0.31583366 0.57750993
+ 0.45615759 0.51066803] [1.37642927 1.30697633 1.66696953 1.5762566  1.62793499 1.86906659
+ 1.6372448  1.56794181 1.78764048 1.61448385 1.52959678 1.57798037
+ 1.45291112 1.49592752 1.49385286 1.51791189 1.75387457 1.2942593
+ 1.46841758 1.43944957]
+Mean:  0.4074594624433817 1.552756290960041
+Std:  0.09604567037994179 0.14550350235860043
+Min:  0.20030442486301459 1.2942592967413802
+Max:  0.6006430108188192 1.8690665948059648
+Test set RMSE= 1.2577357418209227  and R2= 0.5360999424475581
+New dataset RMSE= 1.9705522009764809  and R2= 0.1868772527269683
 
 RF and Opt:
 
-R2 and RMSE for dataset  0 :  [0.60328733 0.68948775 0.53154234 0.40915748 0.59184708 0.43183789
- 0.64342348 0.51144908 0.48178058 0.56437424 0.57953469 0.57828467
- 0.5479287  0.54741098 0.34949024 0.50291659 0.38153875 0.74816704
- 0.49773393 0.67321919] [1.16777558 1.15246156 1.40841237 1.48540484 1.29754799 1.72709325
- 1.37987786 1.43830032 1.439046   1.33987111 1.31447694 1.35770293
- 1.2794501  1.34483759 1.39697147 1.39276356 1.66753103 0.99923888
- 1.41117202 1.17631309]
-Mean:  0.5432206021056821 1.3588124239388706
-Std:  0.10050148286436646 0.16158915542086635
-Min:  0.34949023867662554 0.9992388837207261
-Max:  0.7481670376696578 1.7270932523790081
-Test set RMSE= 1.2309551764243842  and R2= 0.5556449717401799
-Exp. validation set RMSE= 1.815837060507216  and R2= 0.3095472338236629
+R2 and RMSE for dataset  0 :  [0.52305829 0.68251867 0.58806293 0.41982748 0.53220404 0.51003086
+ 0.58241763 0.54428919 0.45004736 0.4792154  0.57592165 0.572026
+ 0.57734374 0.5491394  0.25092279 0.42054666 0.43684507 0.69855641
+ 0.57989423 0.5056082 ] [1.28042459 1.16532261 1.320718   1.4719313  1.38912142 1.60385099
+ 1.49325973 1.38911859 1.48245145 1.4649922  1.32011248 1.36774064
+ 1.23712487 1.3422672  1.49907692 1.50373738 1.59122511 1.09324138
+ 1.29060208 1.44687259]
+Mean:  0.5239238000929644 1.3876595778189458
+Std:  0.09667685332985525 0.13076542937689245
+Min:  0.2509227921813655 1.0932413815147357
+Max:  0.6985564139176359 1.603850991995379
+Test set RMSE= 1.093782292173194  and R2= 0.6491613775156464
+New dataset RMSE= 1.9426782806743375  and R2= 0.20971817859834951
 
 XGB and Morgan:
 
-R2 and RMSE for dataset  0 :  [ 0.2574078  -0.10204311  0.17351146 -0.07264744  0.42251476  0.25692786
-  0.69825974 -0.19242455  0.29578338  0.34202889  0.36021536  0.64042172
-  0.33259799  0.58543555  0.70832035 -0.53424554  0.34567599  0.73101645
- -0.03048451  0.11295443] [1.89579277 2.21820881 2.10769445 2.34374233 1.54048804 1.82781892
- 1.24165379 2.24703642 1.62505764 1.6966507  1.64213041 1.25369469
- 1.63309553 1.47033631 0.91012342 2.44686605 1.76006114 1.02913688
- 2.2972174  2.18354527]
-Mean:  0.26656132935440535 1.7685175482478386
-Std:  0.3250003795434959 0.43794763401416115
-Min:  -0.5342455352322943 0.9101234212157076
-Max:  0.7310164506789927 2.446866051785252
-Test set RMSE= 1.484788002131712  and R2= 0.3534910817377477
-Exp. validation set RMSE= 2.0140171615825073  and R2= 0.15061114858848668
+R2 and RMSE for dataset  0 :  [ 0.21985117  0.02381697  0.09225192  0.21886746  0.27544442  0.25144668
+  0.51860374  0.12157204  0.1912278   0.38225538  0.4004459   0.59224394
+  0.16700813  0.30770334  0.19891845 -0.19978836  0.29791852  0.72593329
+  0.08597442  0.40698811] [1.94314138 2.08770321 2.20887888 2.00006325 1.72553487 1.83454787
+ 1.56832204 1.92862474 1.7415211  1.64396858 1.58966249 1.33504306
+ 1.82447626 1.90005761 1.50829256 2.16378987 1.82316127 1.03881552
+ 2.16351813 1.78534   ]
+Mean:  0.26393416574008177 1.7907231346088062
+Std:  0.20242708582702204 0.28409894131035474
+Min:  -0.19978835603793765 1.038815515826624
+Max:  0.725933288654696 2.2088788811370392
+Test set RMSE= 2.1559292089668745  and R2= -0.3630588721632062
+New dataset RMSE= 2.0426940250355816  and R2= 0.1262506618979179
 
 XGB and Morgan count:
 
-R2 and RMSE for dataset  0 :  [ 0.18276478 -0.21730487  0.25356875  0.11264106  0.27699464  0.3059227
-  0.46950137  0.12153561  0.57992395  0.14970757  0.13450717  0.58238277
-  0.36382378  0.3039978  -0.14064176  0.10291951  0.4601955   0.46160421
- -0.34633287  0.24226228] [1.98879128 2.33132495 2.00301472 2.13172426 1.72368795 1.76653237
- 1.64636461 1.92866473 1.25510366 1.92873777 1.9099521  1.35108996
- 1.59443401 1.90513588 1.79979009 1.87102017 1.59863597 1.45599912
- 2.62577547 2.01812791]
-Mean:  0.2199986970321533 1.8416953493066643
-Std:  0.24184446150491923 0.3126783722557248
-Min:  -0.34633286875989233 1.2551036626874352
-Max:  0.5823827676259901 2.625775473955428
-Test set RMSE= 2.248879473575345  and R2= -0.48312577321657457
-Exp. validation set RMSE= 1.8094996447856322  and R2= 0.3143582937628754
+R2 and RMSE for dataset  0 :  [ 0.22301611 -0.09742701  0.23168645  0.24869823  0.52038025  0.20319998
+  0.63264011  0.2530513   0.17316575  0.3799842   0.403531    0.69868789
+  0.19526602  0.29684211  0.46315044  0.133043    0.38075513  0.81624715
+  0.10391416  0.52159558] [1.93919587 2.21355825 2.03216272 1.96150116 1.40390078 1.89274605
+ 1.37002899 1.77844339 1.76086014 1.64698789 1.58556729 1.14763387
+ 1.79326306 1.91490432 1.23473433 1.83933799 1.71223172 0.85060381
+ 2.14218104 1.60356596]
+Mean:  0.33907139189782437 1.6911704315429088
+Std:  0.2155976538226699 0.3376319065780989
+Min:  -0.09742701269626042 0.8506038098341254
+Max:  0.8162471514147736 2.2135582528404507
+Test set RMSE= 2.0309870289254794  and R2= -0.2096505312796324
+New dataset RMSE= 2.102784542900326  and R2= 0.07408786812322177
 
 XGB and Rdkit:
 
-R2 and RMSE for dataset  0 :  [ 0.19093598 -0.23793234  0.14519426 -0.08795036  0.16649493  0.09225555
-  0.34271413 -0.26300414 -0.1236766   0.06319282  0.17181838  0.48153675
-  0.12120838  0.39243947  0.03302411 -0.56237584  0.01713692  0.466916
- -0.1778161   0.02791457] [1.97882375 2.35099436 2.14349734 2.36040162 1.85072551 2.02022379
- 1.83257196 2.31258149 2.05275114 2.024483   1.86832977 1.50540741
- 1.87396203 1.77998124 1.65712415 2.46919574 2.15713755 1.4487989
- 2.45595332 2.28581697]
-Mean:  0.06300134245472233 2.0214380516397354
-Std:  0.25325927851194363 0.29144541701572757
-Min:  -0.5623758437934823 1.4487989008782975
-Max:  0.48153675355060854 2.4691957413656924
-Test set RMSE= 2.1212821726299524  and R2= -0.31960060290840175
-Exp. validation set RMSE= 2.059586152399538  and R2= 0.11173991094597979
-
-XGB and Opt2:
-
-R2 and RMSE for dataset  0 :  [ 0.5018841  -0.08012988  0.46705804  0.16888411  0.68423089  0.30229122
-  0.47670315  0.18566038  0.02710588  0.05480704  0.17998771  0.59008743
-  0.20738714  0.50438975  0.30038211 -0.05407304  0.25523745  0.39213165
- -0.24915825  0.13316745] [1.55267612 2.19604443 1.692502   2.06306142 1.13912848 1.77114767
- 1.63515132 1.85693816 1.91006621 2.03352384 1.85909216 1.33856874
- 1.77970651 1.60764735 1.40954088 2.02814086 1.87776069 1.54708812
- 2.5292403  2.15852379]
-Mean:  0.25240171700094116 1.7992774524360589
-Std:  0.2372492750487427 0.3179690325642528
-Min:  -0.24915825217730636 1.139128481289249
-Max:  0.6842308874501959 2.5292403045155925
-Test set RMSE= 2.1482314084909655  and R2= -0.3533425760783222
-Exp. validation set RMSE= 2.2163142600358667  and R2= -0.028591436165291917
+R2 and RMSE for dataset  0 :  [0.29133243 0.06483268 0.28377029 0.27777567 0.4417801  0.53622114
+ 0.70850143 0.27062904 0.17824682 0.26159245 0.55845171 0.28430257
+ 0.2832593  0.44753227 0.19778449 0.052406   0.47679423 0.60444222
+ 0.33787804 0.36705476] [1.8519828  2.04337367 1.96207407 1.92316887 1.51457417 1.44401982
+ 1.22039973 1.757393   1.75544137 1.79736836 1.36420565 1.76872286
+ 1.69238383 1.69736057 1.5093597  1.92297621 1.5738654  1.2480019
+ 1.84140941 1.844473  ]
+Mean:  0.34622938317125185 1.6866277201736506
+Std:  0.167934949107036 0.23090879413653156
+Min:  0.05240600205132495 1.2203997316700348
+Max:  0.7085014302022667 2.0433736711196486
+Test set RMSE= 1.896084536463071  and R2= -0.054292249095125644
+New dataset RMSE= 3.0916768140770294  and R2= -1.0015590197109963
 
 XGB and Selfies:
 
@@ -623,7 +576,7 @@ Std:  0.324503128643944 0.23291232472118203
 Min:  -0.8560491445217038 1.9105096914683404
 Max:  0.23067318529944358 2.6926721310596
 Test set RMSE= 2.004569029342637  and R2= -0.1783862150732205
-Exp. validation set RMSE= 2.8888070088413302  and R2= -0.7475003879581577
+New dataset RMSE= 2.8888070088413302  and R2= -0.7475003879581577
 
 XGB and Smiles:
 
@@ -639,235 +592,218 @@ Std:  0.23575292267469147 0.2965946784122653
 Min:  -0.42951909064381155 1.1013846497008384
 Max:  0.6919242802294252 2.361879524632779
 Test set RMSE= 1.8599130352670108  and R2= -0.014450586145497102
-Exp. validation set RMSE= 2.1271444309600263  and R2= 0.0525109911194509
+New dataset RMSE= 2.1271444309600263  and R2= 0.0525109911194509
 
 XGB and Init:
 
-R2 and RMSE for dataset  0 :  [ 0.27183543  0.58154211  0.07897737  0.24880151  0.28826405 -0.01808532
-  0.37391035  0.27603054  0.00395453  0.40428951  0.29778918  0.56942526
-  0.10850721  0.13897994  0.38536966  0.18317177  0.3038131   0.31763374
-  0.18802074  0.39681417] [1.58210799 1.33786705 1.97483042 1.6748901  1.71344997 2.31191434
- 1.82844767 1.75087355 1.99506669 1.56683718 1.6987194  1.37189015
- 1.79671338 1.85491694 1.35789949 1.78536957 1.76921496 1.644833
- 1.79426054 1.59815988]
-Mean:  0.26995224270610024 1.720413114489863
-Std:  0.15775187516926095 0.22403041977204155
+R2 and RMSE for dataset  0 :  [ 0.27183543  0.58154211  0.07897737  0.24880151  0.28498835 -0.01808532
+  0.37391035  0.27603054  0.00488431  0.35801323  0.29778918  0.56942526
+  0.10850721  0.12191058  0.3740546   0.17102532  0.3038131   0.31763374
+  0.19041396  0.39681417] [1.58210799 1.33786705 1.97483042 1.6748901  1.71738845 2.31191434
+ 1.82844767 1.75087355 1.9941353  1.626557   1.6987194  1.37189015
+ 1.79671338 1.87321318 1.37034163 1.79859505 1.76921496 1.644833
+ 1.7916144  1.59815988]
+Mean:  0.2656142497618269 1.725615345518687
+Std:  0.15661894937009138 0.22201625848352954
 Min:  -0.018085320298312002 1.3378670478307844
 Max:  0.5815421106448464 2.311914343475151
-Test set RMSE= 1.4323199414610988  and R2= 0.39837524495392207
-Exp. validation set RMSE= 1.7722635119465222  and R2= 0.342286410969769
+Test set RMSE= 1.5272307060046773  and R2= 0.3160018682218344
+New dataset RMSE= 1.6029589633772359  and R2= 0.46194703215683885
 
 XGB and Var:
 
-R2 and RMSE for dataset  0 :  [ 0.24735212  0.66144213  0.19420119  0.14969735  0.18962551  0.21255106
-  0.55089121  0.29808873 -0.08490908 -0.12317     0.30560495  0.40377801
-  0.15395874  0.14629869 -0.54226893  0.16854217  0.41411477  0.64783675
-  0.10608418  0.22485449] [1.60848596 1.20338206 1.84717469 1.78195088 1.82833115 2.03325034
- 1.54860285 1.72399406 2.08216195 2.15143879 1.68923937 1.61435505
- 1.75031275 1.84701664 2.15100134 1.80128684 1.62302031 1.18163965
- 1.88261429 1.81169996]
-Mean:  0.2162287016299392 1.758047947067023
-Std:  0.26425044431962136 0.2532351687415212
-Min:  -0.5422689286417588 1.181639653669323
-Max:  0.661442133355618 2.1514387891434787
-Test set RMSE= 1.6801497095332045  and R2= 0.1721691945910523
-Exp. validation set RMSE= 1.808688780400518  and R2= 0.3149726490897906
+R2 and RMSE for dataset  0 :  [ 0.24134226  0.46044944  0.13411055  0.18066168  0.17860309  0.08738952
+  0.4792623   0.11754138 -0.33349481 -0.12996165  0.13513386  0.41157575
+  0.22200392  0.2772839  -0.58866206  0.15696596  0.16325922  0.41574489
+  0.13988815  0.21637358] [1.61489504 1.51915872 1.91481086 1.74920454 1.8407233  2.18888214
+ 1.6675305  1.93304442 2.30841293 2.15793371 1.88522129 1.60376356
+ 1.6784507  1.69942381 2.18311388 1.81378296 1.93960434 1.52199875
+ 1.84667515 1.82158396]
+Mean:  0.14827354553883662 1.8444107282013746
+Std:  0.24931998620075652 0.22149875838384755
+Min:  -0.5886620640051075 1.5191587192447882
+Max:  0.4792622966143745 2.308412933931831
+Test set RMSE= 1.5838679589159732  and R2= 0.2643291169264953
+New dataset RMSE= 1.8817733061959063  and R2= 0.2584937264117001
 
 XGB and Cor:
 
-R2 and RMSE for dataset  0 :  [ 0.4483376   0.70893073  0.25405261  0.14997166  0.25202948  0.24011015
-  0.46389685  0.12445379  0.15847088  0.34326257  0.4847995   0.45819188
-  0.11535587 -0.06487964  0.21545966  0.20259956  0.45087026  0.45566908
-  0.34482122  0.57336186] [1.37707644 1.11579717 1.77725096 1.78166343 1.75652453 1.99735368
- 1.69195363 1.92545864 1.83380186 1.64513723 1.45504365 1.53892627
- 1.78979869 2.06285212 1.53415156 1.76400981 1.57128571 1.46907694
- 1.61173245 1.34407808]
-Mean:  0.3189882778291639 1.652148643046085
-Std:  0.1815042847377386 0.22775851017510063
-Min:  -0.06487963611471326 1.115797166896015
-Max:  0.7089307312153311 2.0628521174287506
-Test set RMSE= 1.6562465069637813  and R2= 0.19555645400887778
-Exp. validation set RMSE= 1.833115627819717  and R2= 0.2963447335774064
+R2 and RMSE for dataset  0 :  [ 0.57676706  0.6284889   0.01995555  0.10623145  0.31853559  0.13817725
+  0.57894451  0.25870081  0.19840754 -0.36013642  0.53343738  0.4872574
+  0.63366298  0.33953113 -0.07098882  0.13343198  0.01253893  0.28866441
+  0.35576831  0.50598183] [1.20617711 1.26058744 2.03712438 1.82692828 1.67661584 2.12710354
+ 1.49945674 1.77170504 1.78975938 2.36754085 1.38465907 1.49707914
+ 1.15175548 1.62459088 1.79247495 1.83892531 2.10706373 1.67938515
+ 1.59821087 1.44632576]
+Mean:  0.2841678884514791 1.6841734472539447
+Std:  0.2592046085547278 0.3129899517213432
+Min:  -0.3601364200688273 1.1517554846225941
+Max:  0.6336629792149882 2.367540854957527
+Test set RMSE= 1.6250941260423688  and R2= 0.22553345498609667
+New dataset RMSE= 1.7829204712788491  and R2= 0.33435271393865607
 
 XGB and Opt:
 
-R2 and RMSE for dataset  0 :  [0.19961171 0.64184391 0.36959412 0.35727388 0.04770854 0.43104562
- 0.46853979 0.33012618 0.23496533 0.16993462 0.50301581 0.62693655
- 0.11716157 0.32690663 0.230346   0.35892936 0.46160392 0.52280693
- 0.22771984 0.55108903] [1.65871478 1.23772238 1.63382218 1.54925155 1.98196929 1.72829699
- 1.68461108 1.68419029 1.74847084 1.84953434 1.42908867 1.27698681
- 1.78797111 1.64004397 1.5195269  1.58166938 1.55585323 1.37549844
- 1.74984861 1.37871584]
-Mean:  0.358857967258983 1.6025893336929138
-Std:  0.16304404376681042 0.18711819624742324
-Min:  0.04770854260548374 1.237722381886474
-Max:  0.6418439143165132 1.9819692888015141
-Test set RMSE= 1.9139468246908349  and R2= -0.07424998467569766
-Exp. validation set RMSE= 2.0246886602812486  and R2= 0.14158613511751106
+R2 and RMSE for dataset  0 :  [0.12703836 0.55984146 0.39755716 0.18474977 0.23237657 0.51053359
+ 0.51355391 0.28713182 0.08026015 0.04418864 0.49405038 0.50133697
+ 0.11646214 0.5038602  0.1869661  0.20284183 0.08452607 0.73392218
+ 0.52041627 0.52363049] [1.73228336 1.37211858 1.59717529 1.74483526 1.77945122 1.60302796
+ 1.61169045 1.73739783 1.91712458 1.98468844 1.44192118 1.47638168
+ 1.78867924 1.4080558  1.56176237 1.76374182 2.0288067  1.02711098
+ 1.37893965 1.42025601]
+Mean:  0.3402622035482893 1.6187724199418656
+Std:  0.2006452960751286 0.2363667539273782
+Min:  0.04418864002325196 1.0271109838946801
+Max:  0.7339221821195103 2.028806702610671
+Test set RMSE= 1.4732337090502798  and R2= 0.36351391158884316
+New dataset RMSE= 2.2723296100875547  and R2= -0.08124192729552271
 Running GP takes longer because kernel optimization is integrated into the implementation.
 
 
 GP and Morgan:
 
-R2 and RMSE for dataset  0 :  [0.40591478 0.19460439 0.3099221  0.22646185 0.51018318 0.36592405
- 0.54710072 0.38802125 0.54245998 0.30114053 0.50831158 0.67761321
- 0.37078093 0.42828559 0.427201   0.28464278 0.45419297 0.70592346
- 0.21666873 0.43761955] [1.69566496 1.89630313 1.92592022 1.9903169  1.41874627 1.68845044
- 1.52119435 1.60976629 1.30987598 1.74857376 1.43957975 1.18709009
- 1.58569177 1.72667349 1.27540568 1.67079914 1.60749966 1.07606987
- 2.00287615 1.73861869]
-Mean:  0.4151486315350512 1.6057558305116024
-Std:  0.13730750625988206 0.2536751588192528
-Min:  0.19460438689915904 1.076069874098172
-Max:  0.7059234605862461 2.0028761529796264
-Test set RMSE= 1.9408868017567749  and R2= -0.10470427484857536
-Exp. validation set RMSE= 1.8830539435328648  and R2= 0.2574841215449615
+R2 and RMSE for dataset  0 :  [0.32209622 0.01764185 0.21413084 0.04668775 0.51170018 0.42808418
+ 0.55467941 0.5134696  0.43813658 0.21306174 0.57609016 0.64887175
+ 0.4620137  0.5438412  0.4825351  0.3210298  0.49232704 0.56096549
+ 0.10340974 0.35716259] [1.81133884 2.09429598 2.05524858 2.20952516 1.4165476  1.60355454
+ 1.50841304 1.43532302 1.45154671 1.85549316 1.33668011 1.2388763
+ 1.46623453 1.54233488 1.21223738 1.62775155 1.55032711 1.31479976
+ 2.14278388 1.85883057]
+Mean:  0.3903967448353161 1.636607134980124
+Std:  0.1804204040095942 0.3012443138708364
+Min:  0.017641846715703347 1.2122373835459623
+Max:  0.6488717520124296 2.2095251594166303
+Test set RMSE= 2.5225768796068837  and R2= -0.8660979805065108
+Exp. validation set RMSE= 1.8314796575227885  and R2= 0.29760013222192405
 
 GP and Morgan count:
 
-R2 and RMSE for dataset  0 :  [0.41528776 0.16630752 0.28239281 0.13356939 0.48297204 0.25321549
- 0.54170538 0.34008633 0.5529457  0.2334789  0.52021401 0.63736823
- 0.38791146 0.40933098 0.4169603  0.26444415 0.4097904  0.66923961
- 0.17281004 0.45010256] [1.68223539 1.92932803 1.96395994 2.10643594 1.45762196 1.8323791
- 1.53022844 1.67162255 1.29477937 1.83126454 1.42204886 1.25900654
- 1.56395754 1.75506314 1.28675625 1.69422306 1.67160808 1.14121384
- 2.05818302 1.71921457]
-Mean:  0.3870066535412907 1.6435565078724195
-Std:  0.15098187546926167 0.26619310789417766
-Min:  0.13356939357561648 1.1412138414130621
-Max:  0.6692396109631091 2.10643593858646
-Test set RMSE= 1.8926358153090224  and R2= -0.05046050715262407
-Exp. validation set RMSE= 1.8853238763696625  and R2= 0.25569290674501277
+R2 and RMSE for dataset  0 :  [0.38024481 0.1216862  0.23860005 0.05526003 0.56388488 0.4254514
+ 0.5057151  0.51617942 0.49451133 0.34054608 0.49688585 0.65232684
+ 0.3981237  0.3419244  0.4805188  0.43528715 0.35871118 0.61843278
+ 0.13712545 0.35654135] [1.73191175 1.98028632 2.02299895 2.19956859 1.33871602 1.60724122
+ 1.58917806 1.43132029 1.37680155 1.69856142 1.45620999 1.23276599
+ 1.55085593 1.8525014  1.21459682 1.48448768 1.74244132 1.22573281
+ 2.10210882 1.85972854]
+Mean:  0.39589783978217324 1.6349006722699873
+Std:  0.1567839595185058 0.291205795031308
+Min:  0.05526002612875003 1.2145968234164437
+Max:  0.652326836746002 2.1995685885116703
+Test set RMSE= 2.230301690292084  and R2= -0.45872305856883466
+Exp. validation set RMSE= 1.9300889457295587  and R2= 0.21992767699596338
 
 GP and Rdkit:
 
-R2 and RMSE for dataset  0 :  [0.49354502 0.2635573  0.35841027 0.28973678 0.52742358 0.28080462
- 0.57248274 0.32311609 0.47241595 0.3088277  0.5368186  0.68361393
- 0.43957599 0.44561201 0.43700669 0.27265502 0.41613681 0.68133422
- 0.21752022 0.48338215] [1.56561903 1.81331232 1.8570258  1.90717711 1.39355434 1.79821296
- 1.47795332 1.69297971 1.40657036 1.73893037 1.39722483 1.1759903
- 1.4964982  1.70030784 1.26444179 1.68474037 1.66259654 1.12015469
- 2.00178728 1.66637959]
-Mean:  0.42519878521845794 1.591072837540907
-Std:  0.13195975200986593 0.23760697364984987
-Min:  0.21752021881413885 1.120154685041349
-Max:  0.6836139282500426 2.0017872806400487
-Test set RMSE= 1.9644301131309572  and R2= -0.13166735172308064
-Exp. validation set RMSE= 1.9909021219629164  and R2= 0.16999627477527457
-
-GP and Opt2:
-
-R2 and RMSE for dataset  0 :  [0.41045941 0.26264445 0.30209277 0.16299101 0.50491655 0.26964774
- 0.54857708 0.36809305 0.48378196 0.28316182 0.54495687 0.65988377
- 0.425123   0.36789469 0.49908462 0.16619007 0.39817403 0.67650627
- 0.16803484 0.42166733] [1.68916676 1.81443581 1.93681474 2.07036266 1.42635323 1.81210712
- 1.51871293 1.63576617 1.39133665 1.77092265 1.38489555 1.21929484
- 1.51567226 1.81557991 1.19269502 1.80383285 1.68797802 1.12860824
- 2.0641152  1.76310468]
-Mean:  0.39619406735154133 1.6320877654847308
-Std:  0.14860072253700568 0.2690728792851789
-Min:  0.1629910063033445 1.1286082390968286
-Max:  0.6765062711473665 2.0703626557474735
-Test set RMSE= 2.0047297174469327  and R2= -0.17857514369937233
-Exp. validation set RMSE= 1.884907464254564  and R2= 0.2560216611481796
+R2 and RMSE for dataset  0 :  [ 0.05805827  0.14696882  0.06460371  0.06836723  0.29625744  0.01228506
+  0.19149164  0.16396924  0.25903959  0.01694618  0.27208536  0.11938081
+  0.23204546  0.06366363  0.05855426  0.34014513  0.00762227  0.0610783
+ -0.00116787  0.21722708] [2.13514656 1.95157653 2.2422656  2.18425703 1.7005711  2.10733456
+ 2.03247937 1.88150678 1.66691378 2.0738516  1.75158399 1.96195541
+ 1.7518043  2.20971669 1.63510208 1.60467458 2.16755353 1.92275953
+ 2.26430443 2.05119586]
+Mean:  0.13243108028571354 1.96482766586156
+Std:  0.10445258261821903 0.21046094114853034
+Min:  -0.0011678714687854974 1.6046745841413599
+Max:  0.34014513175851147 2.2643044250452724
+Test set RMSE= 1.8459383592658412  and R2= 0.0007365319034998707
+Exp. validation set RMSE= 2.222755434639922  and R2= -0.034578822174547996
 
 GP and Selfies:
 
-R2 and RMSE for dataset  0 :  [-0.09483575 -0.00462788 -0.02177605 -0.10347526 -0.03709864 -0.04815326
- -0.04393795 -0.09124944 -0.02694282 -0.02623992 -0.00213878 -0.02463137
- -0.00815833 -0.01305072 -0.10040483 -0.00506757 -0.02394691 -0.02332202
- -0.04895209 -0.03897601] [1.93997368 2.07295412 2.08004398 2.02997301 2.06834037 2.34580575
- 2.36103061 2.14959516 2.02577387 2.0565094  2.02932601 2.11630805
- 1.91066372 2.01202526 1.81692446 1.98043408 2.14563774 2.01427702
+R2 and RMSE for dataset  0 :  [-0.09483574 -0.00462827 -0.02177605 -0.10347526 -0.03709864 -0.04815327
+ -0.04393798 -0.09124932 -0.02694282 -0.02623985 -0.00213878 -0.02463137
+ -0.00815833 -0.01305073 -0.02083333 -0.00506757 -0.02394691 -0.02332189
+ -0.04895208 -0.03897601] [1.93997367 2.07295452 2.08004398 2.02997301 2.06834037 2.34580576
+ 2.36103065 2.14959505 2.02577387 2.05650933 2.02932601 2.11630805
+ 1.91066372 2.01202527 1.75       1.98043408 2.14563774 2.01427689
  2.03934576 2.09747802]
-Mean:  -0.039349279758311775 2.0646210035908927
-Std:  0.03208077253826873 0.12296782426347982
-Min:  -0.10347525743646391 1.8169244580425676
-Max:  -0.0021387832699619747 2.3610306075023644
+Mean:  -0.0353707104167121 2.0612747872320902
+Std:  0.0290533695799071 0.13035156322072083
+Min:  -0.10347526265463514 1.7500000000000007
+Max:  -0.0021387832699619747 2.361030646800647
 Test set RMSE= 1.8466185312615795  and R2= 3.892441924335799e-13
 Exp. validation set RMSE= 2.224217538662914  and R2= -0.03594033891235027
 
 GP and Smiles:
 
-R2 and RMSE for dataset  0 :  [-1.80613664e-01 -1.14110822e-01  2.00905418e-02  1.17746298e-01
- -1.74485545e-03 -5.76237574e-02 -2.38570370e-02 -1.99400402e-02
- -1.56087409e-02 -1.90623609e-01 -8.67955935e-06 -1.52925756e-02
- -1.67276560e-02  5.75789172e-03 -3.06080407e-02 -2.07971690e-01
- -2.57467033e-02 -1.33789208e-03 -2.00663401e-02 -4.48903187e-03] [2.39039446 2.23032077 2.29499746 2.12558319 2.02892712 2.1806365
+R2 and RMSE for dataset  0 :  [-1.80613665e-01 -1.14110820e-01  2.00905441e-02  1.17746297e-01
+ -1.74485545e-03 -5.76237484e-02 -2.38570370e-02 -1.99400402e-02
+ -1.56087409e-02 -1.90623604e-01 -8.67955935e-06 -1.52925756e-02
+ -1.67276560e-02  5.75788533e-03 -3.06080401e-02 -2.07971671e-01
+ -2.57467033e-02 -1.33789208e-03 -2.00663401e-02 -4.48903187e-03] [2.39039446 2.23032077 2.29499746 2.1255832  2.02892712 2.1806365
  2.28719688 2.07817434 1.95154625 2.28231862 2.05301737 2.10664165
- 2.01567334 2.27701938 1.7107793  2.17115655 2.20369452 1.98564044
+ 2.01567334 2.27701938 1.7107793  2.17115654 2.20369452 1.98564044
  2.2855755  2.32360249]
-Mean:  -0.03913882010965143 2.1491448073255706
-Std:  0.07614727447880323 0.15804418262459866
-Min:  -0.20797168981559566 1.7107792969773907
-Max:  0.1177462984890163 2.3903944572583464
+Mean:  -0.03913881871277073 2.1491448060682727
+Std:  0.07614727158075606 0.15804418248938956
+Min:  -0.20797167133395278 1.7107792965110655
+Max:  0.11774629680741433 2.390394458650726
 Test set RMSE= 1.846634552800752  and R2= -1.7352374672263693e-05
 Exp. validation set RMSE= 2.25770639482441  and R2= -0.06737038502701154
 
 GP and Init:
 
-R2 and RMSE for dataset  0 :  [0.14925404 0.66245183 0.3375792  0.15912747 0.54367339 0.14117016
- 0.59310867 0.05717029 0.55028602 0.52129818 0.57624708 0.53702942
+R2 and RMSE for dataset  0 :  [0.14925405 0.66245184 0.3375792  0.15912747 0.54367339 0.14117016
+ 0.59310867 0.05717029 0.55028603 0.52129818 0.57624708 0.53702941
  0.26552682 0.43235519 0.31586686 0.38421405 0.39747306 0.74599691
- 0.47868053 0.39208571] [1.71009919 1.20158627 1.67479493 1.77204214 1.37198661 2.12340685
- 1.4740204  1.99807271 1.34055929 1.40455511 1.31960586 1.42256382
+ 0.47868053 0.3920857 ] [1.71009918 1.20158625 1.67479493 1.77204214 1.37198662 2.12340685
+ 1.4740204  1.99807271 1.34055929 1.40455512 1.31960587 1.42256382
  1.63082686 1.50610819 1.43261978 1.55016401 1.64590936 1.00353503
  1.4376892  1.60441176]
-Mean:  0.4120297442620832 1.5312278686219587
-Std:  0.18341271072820997 0.2501853654033293
-Min:  0.05717028908516586 1.0035350325950994
-Max:  0.7459969105603097 2.123406848368374
-Test set RMSE= 1.4269997446070422  and R2= 0.40283628413238615
-Exp. validation set RMSE= 1.96264350978536  and R2= 0.1933909923990288
+Mean:  0.4120297439621933 1.531227868877688
+Std:  0.18341271114834834 0.250185366077544
+Min:  0.05717028577269312 1.003535029762228
+Max:  0.7459969119943564 2.1234068483600392
+Test set RMSE= 1.426999743066604  and R2= 0.40283628542165595
+Exp. validation set RMSE= 1.9626435098914479  and R2= 0.19339099231182877
 
 GP and Var:
 
-R2 and RMSE for dataset  0 :  [ 0.1615501   0.62945115  0.32910832  0.21326012  0.53135357  0.17658443
-  0.57297149 -0.03724752  0.5578685   0.54168668  0.5061946   0.49424832
-  0.34444683  0.54417386  0.33917092  0.3700254   0.39539464  0.69368146
-  0.48337406  0.31562581] [1.69769595 1.25895385 1.68546936 1.71405419 1.39038358 2.07916612
- 1.51005481 2.09573256 1.32920988 1.37431879 1.42451099 1.48683826
- 1.54072045 1.34963846 1.40800825 1.56792138 1.6487457  1.10204589
- 1.43120269 1.70232105]
-Mean:  0.4081461376561052 1.5398496099391987
-Std:  0.1775271803423536 0.2410841913533161
-Min:  -0.03724751621258138 1.1020458883582138
-Max:  0.693681462214685 2.095732557236884
-Test set RMSE= 1.4085571219501651  and R2= 0.4181720921417793
-Exp. validation set RMSE= 1.9215350240576787  and R2= 0.22682672826779116
+R2 and RMSE for dataset  0 :  [ 0.15989805  0.62021014  0.31928209  0.20599431  0.51242134  0.16584024
+  0.55761298 -0.04979625  0.55128631  0.53522184  0.49567251  0.48112297
+  0.33884824  0.53586953  0.3236282   0.36413479  0.3913743   0.6758003
+  0.47125775  0.30071242] [1.69936766 1.27455553 1.69776763 1.72195092 1.41818968 2.09268697
+ 1.53697026 2.10837164 1.33906758 1.38397774 1.43960785 1.50600802
+ 1.54728553 1.36187696 1.42447022 1.57523479 1.6542183  1.13375534
+ 1.44788826 1.72076897]
+Mean:  0.39781960275448275 1.5542009921428217
+Std:  0.17637026498225394 0.23819542780366054
+Min:  -0.04979624656492443 1.133755336699495
+Max:  0.6758002976801835 2.108371642179896
+Test set RMSE= 1.404208044638264  and R2= 0.42175946257278096
+Exp. validation set RMSE= 1.9135447194547328  and R2= 0.2332435201952926
 
 GP and Cor:
 
-R2 and RMSE for dataset  0 :  [0.16250124 0.5686104  0.3482697  0.27310483 0.56273912 0.14205313
- 0.55660779 0.11126369 0.43399855 0.46554388 0.48712824 0.57968575
- 0.35140223 0.39694883 0.30912413 0.37489667 0.36224101 0.57870265
- 0.47412138 0.40091596] [1.69673274 1.35838199 1.6612256  1.64757372 1.34301941 2.12231503
- 1.53871541 1.93990794 1.50392649 1.48409695 1.45175149 1.35544568
- 1.53252515 1.55236884 1.43966233 1.56184764 1.69334704 1.2924311
- 1.44396211 1.59271669]
-Mean:  0.3969929580198415 1.5605976680803388
-Std:  0.14138476123242064 0.19583019046484382
-Min:  0.11126368535424136 1.2924311005363793
-Max:  0.5796857506675335 2.1223150312025014
-Test set RMSE= 1.6579347204877648  and R2= 0.1939156781821576
-Exp. validation set RMSE= 1.7808846058450363  and R2= 0.33587201287412094
+R2 and RMSE for dataset  0 :  [0.15075117 0.56340709 0.31359895 0.23364371 0.57333386 0.13869374
+ 0.51906515 0.08899356 0.48327404 0.46551625 0.49740181 0.60045368
+ 0.31061854 0.46109877 0.32535925 0.35009298 0.36334885 0.50748154
+ 0.46929386 0.41998789] [1.70859382 1.36654965 1.70484001 1.69170381 1.3266491  2.12646605
+ 1.60253454 1.96406285 1.4369709  1.48413532 1.43713759 1.32153488
+ 1.57997306 1.46748078 1.42264621 1.59253276 1.69187566 1.39741145
+ 1.45057468 1.56715946]
+Mean:  0.391770734679131 1.5670416292967433
+Std:  0.14673370967000665 0.20184589957681598
+Min:  0.08899356012437865 1.321534879138967
+Max:  0.6004536766613976 2.1264660464060947
+Test set RMSE= 1.740053868191873  and R2= 0.1120857876218474
+Exp. validation set RMSE= 1.7817119886520254  and R2= 0.33525477386832725
 
 GP and Opt:
 
-R2 and RMSE for dataset  0 :  [0.6689661  0.68628073 0.5686372  0.47810748 0.70267341 0.39197672
- 0.72527432 0.48608212 0.55558336 0.54346406 0.731601   0.76726629
- 0.59544369 0.70311391 0.25970189 0.30464372 0.50550766 0.76215102
- 0.60856506 0.56852829] [1.06673757 1.15839767 1.35149986 1.39604527 1.10746205 1.78665112
- 1.21119453 1.47516813 1.33264044 1.37165134 1.05021528 1.00861335
- 1.21034555 1.08921285 1.49026653 1.6472763  1.49106805 0.9710994
- 1.24578425 1.35167045]
-Mean:  0.5806784008512152 1.2906499996680938
-Std:  0.14203960933210535 0.21332165123039878
-Min:  0.25970188643887104 0.9710994003537786
-Max:  0.7672662858413611 1.7866511195278505
-Test set RMSE= 1.304087666250623  and R2= 0.5012772313000012
-Exp. validation set RMSE= 1.8290542665963756  and R2= 0.2994592478736501
-
+R2 and RMSE for dataset  0 :  [0.66046411 0.72308087 0.55148567 0.42445314 0.54228513 0.40368439
+ 0.65617527 0.49899633 0.38506735 0.56452541 0.69038465 0.653268
+ 0.48436286 0.73893025 0.22585194 0.17580951 0.48367974 0.74596988
+ 0.66390558 0.50629143] [1.0803493  1.0883374  1.37810662 1.46605177 1.37407199 1.76936626
+ 1.35497984 1.4565155  1.56758684 1.33963861 1.12797411 1.2310963
+ 1.36644445 1.0214006  1.52395675 1.79339751 1.52362209 1.00358843
+ 1.15436644 1.44587249]
+Mean:  0.5389335752269167 1.3533361650675808
+Std:  0.15674554198089743 0.22210774059337055
+Min:  0.1758095087447682 1.003588432503655
+Max:  0.7459698779163382 1.7933975053956341
+Test set RMSE= 1.2312866058859173  and R2= 0.5554056581131781
+Exp. validation set RMSE= 1.7198734868700638  and R2= 0.3805971122602948
 
 '''    
     

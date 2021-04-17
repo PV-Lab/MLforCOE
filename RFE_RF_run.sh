@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -o Run_rfe_rf.log-%j                                                           
-#SBATCH -c 20
+#SBATCH -c 8
 
 source /etc/profile
 module load anaconda/2020b

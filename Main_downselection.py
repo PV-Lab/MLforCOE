@@ -261,6 +261,7 @@ if __name__ == "__main__":
     # If True, saves the train-test datafiles.
     save = True
     # If this is True, saves the repeated subsampling splits for train-test.
+    # These are needed for running chemprop (neural network) models.
     save_cv = False
     # Figure formatting options.
     mystyle = FigureDefaults('nature_comp_mat_sc')
@@ -293,18 +294,6 @@ if __name__ == "__main__":
     opt_descr_names = ['MSD', 'MaxDD', 'TI2_L', 'MATS4v', 'MATS4i', 'P_VSA_MR_5', 'P_VSA_MR_6',
        'TDB06s', 'RDF040m', 'Mor20m', 'Mor25m', 'Mor31m', 'Mor10v', 'Mor20v',
        'Mor25v', 'Mor26s', 'R7u', 'H-046', 'H-047', 'SHED_AL', 'ALOGP']
-    '''
-    opt_descr_names = ['MSD', 'MaxDD', 'TI2_L', 'MATS4v', 'MATS4i', 'P_VSA_MR_5', 'P_VSA_MR_6',
-       'TDB06s', 'RDF040m', 'Mor20m', 'Mor25m', 'Mor31m', 'Mor10v', 'Mor20v',
-       'Mor25v', 'R7u', 'H-046', 'H-047', 'SHED_AL', 'ALOGP']
-    opt_descr_names = ['MSD', 'MaxDD', 'TI2_L', 'MATS4v', 'MATS4i', 'P_VSA_MR_5', 'P_VSA_MR_6',
-       'TDB06s', 'RDF040m', 'Mor20m', 'Mor25m', 'Mor31m', 'Mor10v', 'Mor20v',
-       'Mor25v', 'Mor26s', 'R7u', 'H-046', 'H-047', 'SHED_AL', 'ALOGP']
-    opt_descr_names = ['O%', 'MSD', 'MaxDD', 'CIC4', 'TI2_L', 'MATS2p', 'P_VSA_MR_5', 'P_VSA_LogP_2', 'Mor20m', 'Mor25m', 'Mor31m', 'Mor10v', 'Mor20v', 'Mor25v', 'Mor13s', 'Mor06m', 'R4i', 'R7u', 'H-047', 'ALOGP', 'H7u', 'TDB07s', 'TDB10s', 'F02[C-N]']
-    opt_descr_names = ['MSD', 'MaxDD', 'TI2_L', 'MATS4v', 'MATS4i', 'P_VSA_MR_5', 'TDB06s',
-       'RDF040m', 'Mor06m', 'Mor20m', 'Mor25m', 'Mor31m', 'Mor10v', 'Mor20v',
-       'Mor25v', 'R7u', 'H-046', 'H-047', 'SHED_AL', 'ALOGP']
-    '''
     ##########################################################################
     # CODE EXECUTION STARTS
     
@@ -345,13 +334,6 @@ if __name__ == "__main__":
     '''
     Results from the single-molecule test set filtering (lim=3.5 which is default):
     
-    outliers = ['COE-A8C-HAc', 'COE-D63SO3', 'COE2-2pip', 'COE2-3C-C3dipropyl-H',
-                'COE-S6', 'COE-PYRAZINE-3C-BUTYL', 'Amidine', 'Y62C', 'Y6N24C']
-    dataset_outliers = dataset[dataset.name.isin(outliers)]
-    dataset = dataset[~dataset.name.isin(outliers)]    
-    X, y = pick_xy_from_corrmatrix(dataset, corrMatrixFull)
-    groups = define_groups_yvalue(y)
-    
     
     There are  9  molecules with RMSE> 3.5 . These will be dropped from the analysis.
         no                   name  log2mic
@@ -365,46 +347,6 @@ if __name__ == "__main__":
 141  151.0                   Y62C      7.0
 142  152.0                 Y6N24C      6.0
     
-    There are  9  molecules with RMSE> 3.5 . These will be dropped from the analysis.
-            no                   name  log2mic
-            1      2.0            COE-A8C-HAc      9.0
-            23    24.0             COE-D63SO3      9.0
-            42    43.0              COE2-2pip      7.0
-            #61    63.0   COE2-3C-C3dipropyl-H      6.0
-            102  110.0                 COE-S6     10.0
-            117  127.0  COE-PYRAZINE-3C-BUTYL      8.0
-            #137  147.0                Amidine      0.0
-            #141  151.0                   Y62C      7.0
-            #142  152.0                 Y6N24C      6.0
-            #Additionally 128
-            
-       If taking newdata out:
-           There are  9  molecules with RMSE> 3.5 . These will be dropped from the analysis.
-        no                        name  log2mic
-        1      2.0                 COE-A8C-HAc      9.0
-        #14    15.0                 COE-D6C-HAc      9.0
-        23    24.0                  COE-D63SO3      9.0
-        42    43.0                   COE2-2pip      7.0
-        #67    69.0  COE2-3C-C3Npropylimidazole      1.0
-        #97    99.0                     COE2-4C      9.0
-        102  110.0                      COE-S6     10.0
-        117  127.0       COE-PYRAZINE-3C-BUTYL      8.0
-        #118  128.0          COE2-3C-C3A-PROPYL      1.0
-            
-            Old:
-                There are  11  molecules with RMSE>3.5. These will be dropped from the analysis.
-           No.                   NAME  MIC VALUE (Y VALUE)
-    1      2.0            COE-A8C-HAc                  9.0
-    23    24.0             COE-D63SO3                  9.0
-    42    43.0              COE2-2pip                  7.0
-    #58    60.0        COE2-3C-C3DABCO                  8.0
-    #97    99.0                COE2-4C                  9.0
-    102  110.0                 COE-S6                 10.0
-    #109  119.0              COE-Y6IM2                  1.0
-    117  127.0  COE-PYRAZINE-3C-BUTYL                  8.0
-    #118  128.0     COE2-3C-C3A-PROPYL                  1.0
-    137  147.0                Amidine                  0.0
-    142  152.0                 Y6N24C                  6.0
     '''
 
     # Forming of train, test.

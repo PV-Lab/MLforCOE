@@ -33,13 +33,15 @@ Try the desired parts of the project:
 - Main_plot_chemprop_models_and_violins.py: Plot neural network model results and all the violin plots. Works only after Main_train_test_chemprop_models_stratigfied_split.sh has been run.
 - RFE_RF_run.sh: Run RFE for Cor. descriptors. Running this code may take an hour or so, therefore it is better to run on a server.
 - HO_RF_init_var_cor.sh: Hyperparameter optimization for RF. Running this code may take an hour or so, therefore it is better to run on a server.
-- Results: All the resulting figures created when running the codes. 
+- Results: All the resulting figures created when running the codes.
+- Pool BO RF Opt.ipynb, Performance visualization COE-RF.ipynb, Manifold visualization.ipynb: pool Bayesian optimization implementation and histograms for the COE data (adapted from https://github.com/PV-Lab/Benchmarking, please follow the up to date installation instructions in that repository to run the notebooks).
+- TSNE_prediction_analysis_seed3_to_github.py: Supplementary Materials similarity plots
 
 ## Authors
 ||                    |
 | ------------- | ------------------------------ |
 | **AUTHORS**      | Armi Tiihonen, Qiaohao Liang     | 
-| **VERSION**      | 1.0 / April, 2021     | 
+| **VERSION**      | 2.0 / September, 2021     | 
 | **EMAILS**      | armi.tiihonen@gmail.com, hqliang@mit.edu | 
 ||                    |
 

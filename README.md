@@ -6,7 +6,11 @@ Machine learning modelling for novel antibiotics domains - here conjugated oligo
 
 Codes and data are described in the connecting article:
 
-Armi Tiihonen, Sarah J. Cox-Vazquez, Qiaohao Liang, Mohamed Ragab, Zekun Ren, Noor Titan Putri Hartono, Zhe Liu, Shijing Sun, Cheng Zhou, Nathan C. Incandela, Jakkarin Limwonguyt, Alex S. Moreland, Senthilnath Jayavelu, Guillermo C. Bazan, and Tonio Buonassisi, "Predicting antimicrobial activity of conjugated oligoelectrolyte molecules via machine learning" (submitted for review 2021).
+Armi Tiihonen, Sarah J. Cox-Vazquez, Qiaohao Liang, Mohamed Ragab, Zekun Ren, Noor Titan Putri Hartono, Zhe Liu, Shijing Sun, Cheng Zhou, Nathan C. Incandela, Jakkarin Limwonguyt, Alex S. Moreland, Senthilnath Jayavelu, Guillermo C. Bazan, and Tonio Buonassisi (2021). "Predicting antimicrobial activity of conjugated oligoelectrolyte molecules via machine learning". Journal of the American Chemical Society, 143(45), 18917-18931. https://doi.org/10.1021/jacs.1c05055
+
+Arxiv preprint:
+
+Armi Tiihonen, Sarah J. Cox-Vazquez, Qiaohao Liang, Mohamed Ragab, Zekun Ren, Noor Titan Putri Hartono, Zhe Liu, Shijing Sun, Cheng Zhou, Nathan C. Incandela, Jakkarin Limwonguyt, Alex S. Moreland, Senthilnath Jayavelu, Guillermo C. Bazan, and Tonio Buonassisi. "Predicting antimicrobial activity of conjugated oligoelectrolyte molecules via machine learning". arXiv:2105.10236 [physics.app-ph] (Nov. 2021). https://arxiv.org/abs/2105.10236
 
 Molecule data in this repository is provided by Sarah J. Cox-Vazquez, Cheng Zhou, Nathan C. Incandela, Jakkarin Limwonguyt, Alex S. Moreland, and Guillermo C. Bazan.
 
@@ -57,4 +61,16 @@ This work is under BSD-2-Clause License. Please, acknowledge use of this work wi
       year = {2021}
     }
     
-    {To be added: citation of the article}
+    @article{Tiihonen_2021,
+	  doi = {10.1021/jacs.1c05055},
+      url = {https://doi.org/10.1021%2Fjacs.1c05055},
+      year = 2021,
+	  month = {nov},
+      publisher = {American Chemical Society ({ACS})},
+      volume = {143},
+      number = {45},
+      pages = {18917--18931},
+      author = {Armi Tiihonen and Sarah J. Cox-Vazquez and Qiaohao Liang and Mohamed Ragab and Zekun Ren and Noor Titan Putri Hartono and Zhe Liu and Shijing Sun and Cheng Zhou and Nathan C. Incandela and Jakkarin Limwongyut and Alex S. Moreland and Senthilnath Jayavelu and Guillermo C. Bazan and Tonio Buonassisi},
+      title = {Predicting Antimicrobial Activity of Conjugated Oligoelectrolyte Molecules via Machine Learning},
+      journal = {Journal of the American Chemical Society}
+    }
